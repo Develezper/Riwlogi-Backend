@@ -9,6 +9,18 @@ import { requireAuth } from "./middlewares/auth.js";
 
 const router = Router();
 
+router.get("/", (_req, res) => {
+  res.json({
+    ok: true,
+    status: "ok",
+    service: "riwlog-backend",
+    health: {
+      method: "GET",
+      path: "/health",
+    },
+  });
+});
+
 router.use("/health", healthRoutes);
 router.use("/auth", authRoutes);
 router.use("/problems", problemsRoutes);

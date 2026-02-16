@@ -35,6 +35,7 @@ Fuente de problemas para export:
 
 ## Endpoints base
 Bajo prefijo `/api`:
+- `GET /`
 - `GET /health`
 - `POST /auth/login`
 - `POST /auth/register`
@@ -57,4 +58,10 @@ Bajo prefijo `/api`:
 - El catalogo se carga primero desde `docs/backend-handoff/*.json` y, si no existe, hace fallback a `problems/*.json`.
 - Si quieres forzar frontend remoto, usa en frontend `.env`:
   - `VITE_API_MODE=remote`
-  - `VITE_API_BASE=/api`
+  - `VITE_API_BASE=/api` (solo si frontend y backend comparten origen o existe proxy)
+  - Si frontend corre en otro puerto/host sin proxy, usa URL absoluta:
+    - `VITE_API_BASE=http://localhost:8000/api`
+- CORS:
+  - Por defecto permite cualquier origen (`CORS_ORIGINS=*`).
+  - Puedes restringirlo con una lista separada por comas:
+    - `CORS_ORIGINS=http://localhost:5173,https://tu-dominio.com`

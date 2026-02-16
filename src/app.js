@@ -7,10 +7,26 @@ import { notFound } from "./middlewares/not-found.js";
 import { requestContext } from "./middlewares/request-context.js";
 
 const app = express();
+const corsOrigins = env.CORS_ORIGINS;
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    if (corsOrigins.includes("*") || corsOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(null, false);
+  },
+};
 
 app.disable("x-powered-by");
 app.use(requestContext);
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => {
