@@ -17,6 +17,22 @@ bun run dev
 
 Servidor por defecto: `http://localhost:8000`.
 
+## Exportar seed para handoff
+```bash
+bun run export:backend-seed
+```
+
+Genera/actualiza:
+- `docs/backend-handoff/full-seed.json`
+- `docs/backend-handoff/problems.seed.json`
+- `docs/backend-handoff/users.seed.json`
+- `docs/backend-handoff/leaderboard.seed.json`
+
+Fuente de problemas para export:
+- `backend/problems/*.json`
+- fallback: `../frontend/problems/*.json`
+- fallback: `../problems/*.json`
+
 ## Endpoints base
 Bajo prefijo `/api`:
 - `GET /health`
@@ -38,7 +54,7 @@ Bajo prefijo `/api`:
 
 ## Notas
 - Persistencia en memoria (suficiente para pruebas locales).
-- Catalogo de problemas cargado desde `../problems`.
+- El catalogo se carga primero desde `docs/backend-handoff/*.json` y, si no existe, hace fallback a `problems/*.json`.
 - Si quieres forzar frontend remoto, usa en frontend `.env`:
   - `VITE_API_MODE=remote`
   - `VITE_API_BASE=/api`
