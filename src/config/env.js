@@ -14,7 +14,7 @@ function asPort(value, fallback) {
 
 const resolved = {
   NODE_ENV: process.env.NODE_ENV || "development",
-  HOST: process.env.HOST || "127.0.0.1",
+  HOST: process.env.HOST || "localhost",
   PORT: asPort(process.env.PORT, 8000),
   API_PREFIX: process.env.API_PREFIX || "/api",
   CLASSIFIER_API_BASE: String(process.env.CLASSIFIER_API_BASE || "").trim(),

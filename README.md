@@ -15,7 +15,7 @@ bun install
 bun run dev
 ```
 
-Servidor por defecto: `http://127.0.0.1:8000`.
+Servidor por defecto: `http://localhost:8000`.
 
 ## Endpoints base
 Bajo prefijo `/api`:
