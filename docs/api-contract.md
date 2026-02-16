@@ -5,10 +5,21 @@ Base URL default: `/api` (override with `VITE_API_BASE`).
 All JSON requests/responses use `Content-Type: application/json`.
 
 ## Health
+- `GET /`
+- Response:
+```json
+{
+  "ok": true,
+  "status": "ok",
+  "service": "riwlog-backend",
+  "health": { "method": "GET", "path": "/health" }
+}
+```
+
 - `GET /health`
 - Response:
 ```json
-{ "ok": true }
+{ "ok": true, "status": "ok" }
 ```
 
 ## Auth

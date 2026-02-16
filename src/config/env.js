@@ -12,11 +12,21 @@ function asPort(value, fallback) {
   return Number.isInteger(parsed) && parsed > 0 && parsed <= 65535 ? parsed : fallback;
 }
 
+function asList(value, fallback = []) {
+  const raw = String(value || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  return raw.length ? raw : fallback;
+}
+
 const resolved = {
   NODE_ENV: process.env.NODE_ENV || "development",
   HOST: process.env.HOST || "localhost",
   PORT: asPort(process.env.PORT, 8000),
   API_PREFIX: process.env.API_PREFIX || "/api",
+  CORS_ORIGINS: asList(process.env.CORS_ORIGINS, ["*"]),
   CLASSIFIER_API_BASE: String(process.env.CLASSIFIER_API_BASE || "").trim(),
 };
 
