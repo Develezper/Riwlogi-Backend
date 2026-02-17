@@ -8,6 +8,19 @@ Backend minimo para probar el frontend de Riwlog con buenas practicas y estructu
 - Express
 - Axios
 
+## Estructura del proyecto
+```text
+src/
+├─ app.js                # configura middlewares globales y API
+├─ api.routes.js         # enrutador principal por feature
+├─ server.js             # arranque del servidor
+├─ config/               # variables de entorno y cliente HTTP
+├─ data/                 # seeds, store en memoria y catalogo de problemas
+├─ middleware/           # auth, manejo de errores y contexto por request
+├─ features/             # modulos de dominio (auth, problems, submissions, etc.)
+└─ utils/                # utilidades compartidas
+```
+
 ## Ejecutar
 ```bash
 cd backend

@@ -1,10 +1,10 @@
 import cors from "cors";
 import express from "express";
 import { env } from "./config/env.js";
-import { apiRoutes } from "./routes.js";
-import { errorHandler } from "./middlewares/error-handler.js";
-import { notFound } from "./middlewares/not-found.js";
-import { requestContext } from "./middlewares/request-context.js";
+import { apiRoutes } from "./api.routes.js";
+import { errorHandler } from "./middleware/error-handler.js";
+import { notFound } from "./middleware/not-found.js";
+import { requestContext } from "./middleware/request-context.js";
 
 const app = express();
 const corsOrigins = env.CORS_ORIGINS;

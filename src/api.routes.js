@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { authRoutes } from "./modules/auth/auth.routes.js";
-import { healthRoutes } from "./modules/health/health.routes.js";
-import { leaderboardRoutes } from "./modules/leaderboard/leaderboard.routes.js";
-import { problemsRoutes } from "./modules/problems/problems.routes.js";
-import { profileRoutes } from "./modules/profile/profile.routes.js";
-import { submissionsRoutes } from "./modules/submissions/submissions.routes.js";
-import { requireAuth } from "./middlewares/auth.js";
+import { authRoutes } from "./features/auth/auth.routes.js";
+import { healthRoutes } from "./features/health/health.routes.js";
+import { leaderboardRoutes } from "./features/leaderboard/leaderboard.routes.js";
+import { problemsRoutes } from "./features/problems/problems.routes.js";
+import { profileRoutes } from "./features/profile/profile.routes.js";
+import { submissionsRoutes } from "./features/submissions/submissions.routes.js";
+import { requireAuth } from "./middleware/auth.js";
 
 const router = Router();
 
