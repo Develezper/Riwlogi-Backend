@@ -7,6 +7,8 @@ import { notFound } from "./middlewares/not-found.js";
 import { requestContext } from "./middlewares/request-context.js";
 
 const app = express();
+app.disable("x-powered-by"); 
+
 const corsOrigins = env.CORS_ORIGINS;
 const corsOptions = {
   origin(origin, callback) {
@@ -30,7 +32,7 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => {
-  res.json({ ok: true, service: "riwlog-backend", docs: `${env.API_PREFIX}/health` });
+  res.json({ ok: true, service: "riwlogi-backend", docs: `${env.API_PREFIX}/health` });
 });
 
 app.use(env.API_PREFIX, apiRoutes);

@@ -24,7 +24,7 @@ const USERS_SEED = [
   {
     id: "user_demo",
     username: "demo",
-    email: "demo@riwlog.dev",
+    email: "demo@riwlogi.dev",
     password_plain: "123456",
     display_name: "Demo User",
     created_at: "2026-01-03T10:00:00.000Z",
@@ -32,7 +32,7 @@ const USERS_SEED = [
   {
     id: "user_code_ninja",
     username: "code_ninja",
-    email: "code@riwlog.dev",
+    email: "code@riwlogi.dev",
     password_plain: "123456",
     display_name: "Code Ninja",
     created_at: "2025-11-22T10:00:00.000Z",

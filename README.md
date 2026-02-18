@@ -1,6 +1,6 @@
-# Riwlog Backend (Bun + Express)
+# Riwlogi Backend (Bun + Express)
 
-Backend minimo para probar el frontend de Riwlog con buenas practicas y estructura modular.
+Backend minimo para probar el frontend de Riwlogi con buenas practicas y estructura modular.
 
 ## Stack
 - Bun runtime
@@ -51,7 +51,7 @@ Bajo prefijo `/api`:
 - `GET /profile/submissions` (auth)
 
 ## Credenciales demo
-- `demo@riwlog.dev` / `123456`
+- `demo@riwlogi.dev` / `123456`
 
 ## Notas
 - Persistencia en memoria (suficiente para pruebas locales).
