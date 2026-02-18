@@ -36,10 +36,10 @@ bun run export:backend-seed
 ```
 
 Genera/actualiza:
-- `docs/backend-handoff/full-seed.json`
-- `docs/backend-handoff/problems.seed.json`
-- `docs/backend-handoff/users.seed.json`
-- `docs/backend-handoff/leaderboard.seed.json`
+- `src/data/backend-handoff/full-seed.json`
+- `src/data/backend-handoff/problems.seed.json`
+- `src/data/backend-handoff/users.seed.json`
+- `src/data/backend-handoff/leaderboard.seed.json`
 
 Fuente de problemas para export:
 - `backend/problems/*.json`
@@ -68,7 +68,7 @@ Bajo prefijo `/api`:
 
 ## Notas
 - Persistencia en memoria (suficiente para pruebas locales).
-- El catalogo se carga primero desde `docs/backend-handoff/*.json` y, si no existe, hace fallback a `problems/*.json`.
+- El catalogo se carga primero desde `src/data/backend-handoff/*.json` y, si no existe, hace fallback a `problems/*.json`.
 - Si quieres forzar frontend remoto, usa en frontend `.env`:
   - `VITE_API_MODE=remote`
   - `VITE_API_BASE=/api` (solo si frontend y backend comparten origen o existe proxy)
