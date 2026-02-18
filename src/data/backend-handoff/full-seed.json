@@ -1,0 +1,288 @@
+{
+  "generated_at": "2026-02-18T01:46:44.405Z",
+  "source": {
+    "problems_glob": "src/data/backend-handoff/*.json",
+    "users_seed": "src/shared/services/api/local-provider.js",
+    "leaderboard_seed": "src/shared/services/api/local-provider.js"
+  },
+  "counts": {
+    "problems": 4,
+    "tags": 8,
+    "users": 2,
+    "leaderboard_entries": 10
+  },
+  "users_seed": [
+    {
+      "id": "user_demo",
+      "username": "demo",
+      "email": "demo@riwlogi.dev",
+      "password_plain": "123456",
+      "display_name": "Demo User",
+      "created_at": "2026-01-03T10:00:00.000Z"
+    },
+    {
+      "id": "user_code_ninja",
+      "username": "code_ninja",
+      "email": "code@riwlogi.dev",
+      "password_plain": "123456",
+      "display_name": "Code Ninja",
+      "created_at": "2025-11-22T10:00:00.000Z"
+    }
+  ],
+  "leaderboard_seed": [
+    {
+      "username": "algorithmist",
+      "score": 4850,
+      "solved": 87,
+      "streak": 32
+    },
+    {
+      "username": "code_ninja",
+      "score": 4720,
+      "solved": 82,
+      "streak": 28
+    },
+    {
+      "username": "byte_master",
+      "score": 4580,
+      "solved": 79,
+      "streak": 21
+    },
+    {
+      "username": "devSara",
+      "score": 4320,
+      "solved": 74,
+      "streak": 18
+    },
+    {
+      "username": "logic_lord",
+      "score": 4100,
+      "solved": 71,
+      "streak": 15
+    },
+    {
+      "username": "func_wizard",
+      "score": 3920,
+      "solved": 68,
+      "streak": 14
+    },
+    {
+      "username": "recursion_queen",
+      "score": 3780,
+      "solved": 65,
+      "streak": 12
+    },
+    {
+      "username": "stack_overflow",
+      "score": 3650,
+      "solved": 62,
+      "streak": 11
+    },
+    {
+      "username": "dp_guru",
+      "score": 3500,
+      "solved": 59,
+      "streak": 9
+    },
+    {
+      "username": "hash_hero",
+      "score": 3350,
+      "solved": 56,
+      "streak": 7
+    }
+  ],
+  "tags": [
+    "Arrays",
+    "Binary Search",
+    "Dynamic Programming",
+    "Hash Table",
+    "Sorting",
+    "Stack",
+    "Strings",
+    "Trees"
+  ],
+  "problems": [
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [
+        "Arrays",
+        "Binary Search",
+        "Dynamic Programming",
+        "Hash Table",
+        "Sorting",
+        "Stack",
+        "Strings",
+        "Trees"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    }
+  ],
+  "api_payload_examples": {
+    "problems_list": {
+      "items": [
+        {
+          "id": "undefined",
+          "slug": "undefined",
+          "title": "",
+          "difficulty": 1,
+          "tags": [
+            "Arrays",
+            "Binary Search",
+            "Dynamic Programming",
+            "Hash Table",
+            "Sorting",
+            "Stack",
+            "Strings",
+            "Trees"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 0
+        },
+        {
+          "id": "undefined",
+          "slug": "undefined",
+          "title": "",
+          "difficulty": 1,
+          "tags": [],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 0
+        },
+        {
+          "id": "undefined",
+          "slug": "undefined",
+          "title": "",
+          "difficulty": 1,
+          "tags": [],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 0
+        },
+        {
+          "id": "undefined",
+          "slug": "undefined",
+          "title": "",
+          "difficulty": 1,
+          "tags": [],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 0
+        }
+      ]
+    },
+    "problems_tags": {
+      "items": [
+        "Arrays",
+        "Binary Search",
+        "Dynamic Programming",
+        "Hash Table",
+        "Sorting",
+        "Stack",
+        "Strings",
+        "Trees"
+      ]
+    },
+    "problem_by_slug": {
+      "item": {
+        "id": "undefined",
+        "slug": "undefined",
+        "title": "",
+        "difficulty": 1,
+        "tags": [
+          "Arrays",
+          "Binary Search",
+          "Dynamic Programming",
+          "Hash Table",
+          "Sorting",
+          "Stack",
+          "Strings",
+          "Trees"
+        ],
+        "acceptance": 0,
+        "submissions": 0,
+        "description": "",
+        "examples": [],
+        "constraints": [],
+        "statement_md": "",
+        "starter_code": {
+          "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+          "javascript": "function solve() {\n  // Write your solution here\n}"
+        },
+        "stages": [],
+        "stages_count": 0
+      }
+    }
+  }
+}

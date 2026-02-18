@@ -5,8 +5,10 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, "..");
-const OUTPUT_DIR = path.join(ROOT_DIR, "docs", "backend-handoff");
+const OUTPUT_DIR = path.resolve(__dirname, "../src/data/backend-handoff");
 
+console.log("ROOT_DIR:", ROOT_DIR);
+console.log("OUTPUT_DIR:", OUTPUT_DIR);
 const LEADERBOARD_SEED = [
   { username: "algorithmist", score: 4850, solved: 87, streak: 32 },
   { username: "code_ninja", score: 4720, solved: 82, streak: 28 },
@@ -24,7 +26,7 @@ const USERS_SEED = [
   {
     id: "user_demo",
     username: "demo",
-    email: "demo@riwlog.dev",
+    email: "demo@riwlogi.dev",
     password_plain: "123456",
     display_name: "Demo User",
     created_at: "2026-01-03T10:00:00.000Z",
@@ -32,7 +34,7 @@ const USERS_SEED = [
   {
     id: "user_code_ninja",
     username: "code_ninja",
-    email: "code@riwlog.dev",
+    email: "code@riwlogi.dev",
     password_plain: "123456",
     display_name: "Code Ninja",
     created_at: "2025-11-22T10:00:00.000Z",
@@ -171,9 +173,7 @@ function problemSummary(problem) {
 
 async function loadProblems() {
   const candidates = [
-    path.join(ROOT_DIR, "problems"),
-    path.join(ROOT_DIR, "..", "frontend", "problems"),
-    path.join(ROOT_DIR, "..", "problems"),
+    path.join(ROOT_DIR, "src", "data", "backend-handoff"),
   ];
 
   let problemsDir = null;

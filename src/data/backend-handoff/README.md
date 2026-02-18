@@ -10,15 +10,15 @@ bun run export:backend-seed
 
 ## Archivos resultantes
 
-- `docs/backend-handoff/full-seed.json`:
+- `src/data/backend-handoff/full-seed.json`:
   - problemas normalizados
   - tags
   - usuarios demo seed
   - leaderboard seed
   - ejemplos de payload API
-- `docs/backend-handoff/problems.seed.json`: solo problemas.
-- `docs/backend-handoff/users.seed.json`: usuarios demo seed.
-- `docs/backend-handoff/leaderboard.seed.json`: leaderboard seed.
+- `src/data/backend-handoff/problems.seed.json`: solo problemas.
+- `src/data/backend-handoff/users.seed.json`: usuarios demo seed.
+- `src/data/backend-handoff/leaderboard.seed.json`: leaderboard seed.
 
 ## Fuente de datos
 
