@@ -4,11 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// La raíz del proyecto (un nivel arriba de scripts/)
 const ROOT_DIR = path.resolve(__dirname, "..");
-
-// Carpeta donde quieres generar los seeds
 const OUTPUT_DIR = path.resolve(__dirname, "../src/data/backend-handoff");
 
 console.log("ROOT_DIR:", ROOT_DIR);
