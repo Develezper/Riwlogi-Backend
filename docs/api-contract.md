@@ -11,7 +11,7 @@ All JSON requests/responses use `Content-Type: application/json`.
 {
   "ok": true,
   "status": "ok",
-  "service": "riwlog-backend",
+  "service": "riwlogi-backend",
   "health": { "method": "GET", "path": "/health" }
 }
 ```
@@ -26,7 +26,7 @@ All JSON requests/responses use `Content-Type: application/json`.
 - `POST /auth/login`
 - Body:
 ```json
-{ "email": "demo@riwlog.dev", "password": "123456" }
+{ "email": "demo@riwlogi.dev", "password": "123456" }
 ```
 - Response:
 ```json
@@ -35,7 +35,7 @@ All JSON requests/responses use `Content-Type: application/json`.
   "user": {
     "id": "user_1",
     "username": "demo",
-    "email": "demo@riwlog.dev",
+    "email": "demo@riwlogi.dev",
     "display_name": "Demo",
     "created_at": "2026-01-01T00:00:00.000Z"
   }
@@ -45,7 +45,7 @@ All JSON requests/responses use `Content-Type: application/json`.
 - `POST /auth/register`
 - Body:
 ```json
-{ "username": "demo", "email": "demo@riwlog.dev", "password": "123456" }
+{ "username": "demo", "email": "demo@riwlogi.dev", "password": "123456" }
 ```
 - Response: same shape as login.
 
@@ -196,7 +196,7 @@ All JSON requests/responses use `Content-Type: application/json`.
   "user": {
     "id": "user_1",
     "username": "demo",
-    "email": "demo@riwlog.dev",
+    "email": "demo@riwlogi.dev",
     "display_name": "Demo",
     "created_at": "2026-01-01T00:00:00.000Z"
   },

@@ -13,7 +13,7 @@ router.get("/", (_req, res) => {
   res.json({
     ok: true,
     status: "ok",
-    service: "riwlog-backend",
+    service: "riwlogi-backend",
     health: {
       method: "GET",
       path: "/health",
