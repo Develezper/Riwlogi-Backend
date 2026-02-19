@@ -7,7 +7,6 @@ import { notFound } from "./middleware/not-found.js";
 import { requestContext } from "./middleware/request-context.js";
 
 const app = express();
-app.disable("x-powered-by"); 
 
 const corsOrigins = env.CORS_ORIGINS;
 const corsOptions = {
@@ -16,12 +15,12 @@ const corsOptions = {
       callback(null, true);
       return;
     }
-
+    
     if (corsOrigins.includes("*") || corsOrigins.includes(origin)) {
       callback(null, true);
       return;
     }
-
+    
     callback(null, false);
   },
 };
@@ -35,7 +34,9 @@ app.get("/", (_req, res) => {
   res.json({ ok: true, service: "riwlogi-backend", docs: `${env.API_PREFIX}/health` });
 });
 
+
 app.use(env.API_PREFIX, apiRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
 

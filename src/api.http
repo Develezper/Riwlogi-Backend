@@ -1,0 +1,16 @@
+GET http://localhost:8000/api
+
+###
+
+# List all problems
+GET http://localhost:8000/api/problems
+
+###
+
+# Health
+GET http://localhost:8000/api/health
+
+###
+
+# Leaderboard
+GET http://localhost:8000/api/leaderboard
