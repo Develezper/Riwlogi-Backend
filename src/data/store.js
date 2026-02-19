@@ -9,6 +9,7 @@ function normalizeUser(user) {
     username: user.username,
     email: user.email,
     password_hash: user.password_hash,
+    role: user.role || "user",
     display_name: user.display_name || user.username,
     created_at: user.created_at || nowIso(),
   };
@@ -69,6 +70,7 @@ class InMemoryStore {
       username: String(username || "").trim(),
       email: String(email || "").trim().toLowerCase(),
       password_hash: hashPassword(password),
+      role: "user",
       display_name: String(username || "").trim(),
       created_at: nowIso(),
     });

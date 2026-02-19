@@ -18,3 +18,5 @@ export function registerController(req, res) {
 
   res.status(201).json(result);
 }
+
+

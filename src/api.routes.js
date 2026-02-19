@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { adminRoutes } from "./features/admin/admin.routes.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { healthRoutes } from "./features/health/health.routes.js";
 import { leaderboardRoutes } from "./features/leaderboard/leaderboard.routes.js";
@@ -27,5 +28,6 @@ router.use("/problems", problemsRoutes);
 router.use("/submissions", requireAuth, submissionsRoutes);
 router.use("/leaderboard", leaderboardRoutes);
 router.use("/profile", requireAuth, profileRoutes);
+router.use("/admin", requireAuth, adminRoutes);
 
 export { router as apiRoutes };

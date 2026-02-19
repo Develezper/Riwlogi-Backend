@@ -9,10 +9,20 @@ const handoffDir = path.join(backendRoot, "src", "data", "backend-handoff");
 
 const FALLBACK_USERS = [
   {
+    id: "user_admin",
+    username: "admin",
+    email: "admin@riwlogi.dev",
+    password: "admin123",
+    role: "admin",
+    display_name: "Administrator",
+    created_at: "2026-01-01T10:00:00.000Z",
+  },
+  {
     id: "user_demo",
     username: "demo",
     email: "demo@riwlogi.dev",
     password: "123456",
+    role: "user",
     display_name: "Demo User",
     created_at: "2026-01-03T10:00:00.000Z",
   },
@@ -21,6 +31,7 @@ const FALLBACK_USERS = [
     username: "code_ninja",
     email: "code@riwlogi.dev",
     password: "123456",
+    role: "user",
     display_name: "Code Ninja",
     created_at: "2025-11-22T10:00:00.000Z",
   },
@@ -61,6 +72,7 @@ function normalizeUsers(items) {
       username: String(entry?.username || "").trim(),
       email: String(entry?.email || "").trim().toLowerCase(),
       password: String(entry?.password || entry?.password_plain || "123456"),
+      role: String(entry?.role || "user").trim(),
       display_name: String(entry?.display_name || entry?.username || "").trim(),
       created_at: String(entry?.created_at || ""),
     }))
