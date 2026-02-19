@@ -1,153 +1,34 @@
-import { httpClient } from "../../config/http-client.js";
-import { env } from "../../config/env.js";
 import { getProblemBySlug } from "../../data/problem-catalog.js";
 import { store } from "../../data/store.js";
-import { hashString } from "../../utils/hash.js";
 import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
+import { classifyFromEvents, sanitizeEvents } from "./submissions.events.js";
+import { evaluateStage } from "./submissions.evaluator.js";
+import { withSubmissionLock } from "./submissions.lock.js";
+import {
+  normalizeLanguage,
+  normalizeProblemId,
+  normalizeStageId,
+  normalizeSubmissionId,
+  validateLanguageCode,
+} from "./submissions.validation.js";
 
 function findStage(problem, stageId) {
   return problem.stages.find((stage) => stage.id === stageId) || null;
 }
 
-function eventSummary(events = []) {
-  return events.reduce(
-    (acc, event) => {
-      if (event.type === "key") acc.key += Number(event.char_count || 0);
-      if (event.type === "paste") acc.paste += Number(event.char_count || 0);
-      if (event.type === "delete") acc.delete += Number(event.char_count || 0);
-      if (event.type === "run") acc.run += 1;
-      return acc;
-    },
-    { key: 0, paste: 0, delete: 0, run: 0 },
-  );
-}
-
-function classifyWithHeuristic(events = []) {
-  const summary = eventSummary(events);
-  const totalInput = summary.key + summary.paste;
-  const pasteRatio = totalInput > 0 ? summary.paste / totalInput : 0;
-
-  let label = "human";
-  if (pasteRatio >= 0.7) label = "ai_generated";
-  else if (pasteRatio >= 0.35) label = "assisted";
-
-  let confidence = 0.55 + pasteRatio * 0.4;
-  if (summary.run >= 3 && pasteRatio < 0.2) confidence -= 0.08;
-
-  return {
-    label,
-    confidence: Number(Math.max(0.5, Math.min(0.98, confidence)).toFixed(2)),
-  };
-}
-
-async function classifyFromEvents(events = []) {
-  const fallback = classifyWithHeuristic(events);
-
-  if (!env.CLASSIFIER_API_BASE) return fallback;
-
-  try {
-    const payload = {
-      events,
-      summary: eventSummary(events),
-    };
-
-    const { data } = await httpClient.post(`${env.CLASSIFIER_API_BASE.replace(/\/$/, "")}/classify`, payload);
-
-    if (!data || typeof data !== "object") return fallback;
-
-    const label = typeof data.label === "string" && data.label.trim() ? data.label : fallback.label;
-    const confidence = Number(data.confidence);
-
-    return {
-      label,
-      confidence: Number.isFinite(confidence) ? confidence : fallback.confidence,
-    };
-  } catch {
-    return fallback;
-  }
-}
-
-function evaluateStage(code, stage) {
-  const normalizedCode = String(code || "").trim();
-  const signature = hashString(`${stage.id}|${normalizedCode}`);
-  const tooShort = normalizedCode.length < 24;
-  const placeholder = /\b(pass|todo|write your solution here)\b/i.test(normalizedCode);
-  const passed = !tooShort && !placeholder && signature % 100 >= 28;
-
-  const visibleTests = Array.isArray(stage.visible_tests) ? stage.visible_tests : [];
-  const failingIndex = visibleTests.length ? signature % visibleTests.length : -1;
-
-  const visibleResults = visibleTests.map((test, index) => {
-    const testPassed = passed ? true : index !== failingIndex;
-    return {
-      input_text: test.input_text,
-      expected_text: test.expected_text,
-      passed: testPassed,
-      error: testPassed ? null : "Output mismatch",
-    };
-  });
-
-  return {
-    passed,
-    runtime_ms: 12 + (signature % 180),
-    stage_score: passed ? Math.max(55, 100 - (signature % 22)) : Math.max(8, 30 - (signature % 15)),
-    visible_results: visibleResults,
-  };
-}
-
-function sanitizeEvents(events) {
-  if (!Array.isArray(events)) return [];
-  return events.slice(0, 200).map((event) => ({
-    type: String(event?.type || "unknown"),
-    char_count: Number(event?.char_count || 0),
-    timestamp: event?.timestamp || nowIso(),
-  }));
-}
-
-function validateLanguage(code, language) {
-  const normalizedCode = String(code || "").trim();
-  const normalizedLang = String(language || "").toLowerCase();
-
-  if (!normalizedCode) {
-    throw new HttpError(400, "El código no puede estar vacío.");
-  }
-
-  // Patrones básicos para detectar el lenguaje
-  const pythonPatterns = /^(def\s|class\s|import\s|from\s|@|if\s.*:|for\s.*:|while\s.*:|try:|except:|#)/m;
-  const jsPatterns = /^(function\s|const\s|let\s|var\s|class\s|import\s|export\s|=>|\/\/|\/\*)/m;
-  const tsPatterns = /^(function\s|const\s|let\s|var\s|class\s|import\s|export\s|interface\s|type\s|enum\s|=>|:\s*(string|number|boolean|any|void|Array|Promise)|\/\/|\/\*)/m;
-
-  if (normalizedLang === "python") {
-    if (!pythonPatterns.test(normalizedCode)) {
-      throw new HttpError(400, "El código no parece estar escrito en Python. Verifica que uses la sintaxis correcta (def, class, etc.).");
-    }
-  } else if (normalizedLang === "javascript") {
-    if (!jsPatterns.test(normalizedCode)) {
-      throw new HttpError(400, "El código no parece estar escrito en JavaScript. Verifica que uses la sintaxis correcta (function, const, etc.).");
-    }
-    // Verificar que NO tenga anotaciones de tipos (sería TypeScript)
-    if (tsPatterns.test(normalizedCode) && /:\s*(string|number|boolean|any|void|Array|Promise|interface|type\s)/.test(normalizedCode)) {
-      throw new HttpError(400, "Detectamos anotaciones de tipos. Si estás usando TypeScript, selecciona TypeScript como lenguaje.");
-    }
-  } else if (normalizedLang === "typescript") {
-    if (!tsPatterns.test(normalizedCode)) {
-      throw new HttpError(400, "El código no parece estar escrito en TypeScript. Verifica que uses la sintaxis correcta.");
-    }
-  }
-
-  return true;
-}
-
 export function startSubmission({ userId, problemId, language = "python" }) {
-  const problem = getProblemBySlug(problemId);
+  const normalizedProblemId = normalizeProblemId(problemId);
+  const normalizedLanguage = normalizeLanguage(language);
+
+  const problem = getProblemBySlug(normalizedProblemId);
   if (!problem) throw new HttpError(400, "Problema inválido.");
 
   const submission = store.createSubmission({
     user_id: userId,
     problem_id: problem.id,
     problem_title: problem.title,
-    language,
+    language: normalizedLanguage,
   });
 
   return {
@@ -156,85 +37,98 @@ export function startSubmission({ userId, problemId, language = "python" }) {
 }
 
 export async function runSubmission({ userId, submissionId, stageId, code, events = [] }) {
-  const submission = store.findSubmissionByOwner(submissionId, userId);
-  if (!submission) {
-    throw new HttpError(404, "No se encontró la submission activa.");
-  }
+  const normalizedSubmissionId = normalizeSubmissionId(submissionId);
+  const normalizedStageId = normalizeStageId(stageId);
 
-  const problem = getProblemBySlug(submission.problem_id);
-  if (!problem) {
-    throw new HttpError(404, "No se encontró el problema de la submission.");
-  }
+  return withSubmissionLock(normalizedSubmissionId, async () => {
+    const submission = store.findSubmissionByOwner(normalizedSubmissionId, userId);
+    if (!submission) {
+      throw new HttpError(404, "No se encontró la submission activa.");
+    }
 
-  const stage = findStage(problem, stageId);
-  if (!stage) {
-    throw new HttpError(400, "Stage inválido.");
-  }
+    const problem = getProblemBySlug(submission.problem_id);
+    if (!problem) {
+      throw new HttpError(404, "No se encontró el problema de la submission.");
+    }
 
-  // Validar que el código esté en el lenguaje declarado
-  validateLanguage(code, submission.language);
+    const stage = findStage(problem, normalizedStageId);
+    if (!stage) {
+      throw new HttpError(400, "Stage inválido.");
+    }
 
-  const cleanEvents = sanitizeEvents(events);
-  const result = evaluateStage(code, stage);
-  const classification = await classifyFromEvents(cleanEvents);
+    const { code: normalizedCode } = validateLanguageCode(code, submission.language);
+    const cleanEvents = sanitizeEvents(events);
+    const result = evaluateStage(normalizedCode, stage);
+    const classification = await classifyFromEvents(cleanEvents);
 
-  submission.code = String(code || "");
-  submission.runtime_ms = result.runtime_ms;
-  submission.stage_results[stage.id] = {
-    stage_id: stage.id,
-    stage_index: stage.stage_index,
-    passed: result.passed,
-    stage_score: result.stage_score,
-    runtime_ms: result.runtime_ms,
-  };
-  submission.events.push(...cleanEvents);
+    submission.code = normalizedCode;
+    submission.runtime_ms = result.runtime_ms;
+    submission.stage_results[stage.id] = {
+      stage_id: stage.id,
+      stage_index: stage.stage_index,
+      passed: result.passed,
+      stage_score: result.stage_score,
+      runtime_ms: result.runtime_ms,
+    };
+    submission.updated_at = nowIso();
+    store.appendSubmissionEvents(submission.id, cleanEvents);
 
-  return {
-    passed: result.passed,
-    stage_index: stage.stage_index,
-    stage_score: result.stage_score,
-    runtime_ms: result.runtime_ms,
-    visible_results: result.visible_results,
-    classification,
-  };
+    return {
+      passed: result.passed,
+      stage_index: stage.stage_index,
+      stage_score: result.stage_score,
+      runtime_ms: result.runtime_ms,
+      visible_results: result.visible_results,
+      classification,
+    };
+  });
 }
 
-export function submitSubmission({ userId, submissionId }) {
-  const submission = store.findSubmissionByOwner(submissionId, userId);
-  if (!submission) throw new HttpError(404, "Submission no encontrada.");
+export async function submitSubmission({ userId, submissionId }) {
+  const normalizedSubmissionId = normalizeSubmissionId(submissionId);
 
-  const problem = getProblemBySlug(submission.problem_id);
-  if (!problem) throw new HttpError(404, "Problema no encontrado.");
+  return withSubmissionLock(normalizedSubmissionId, async () => {
+    const submission = store.findSubmissionByOwner(normalizedSubmissionId, userId);
+    if (!submission) throw new HttpError(404, "Submission no encontrada.");
 
-  const stageResults = problem.stages.map((stage) => submission.stage_results[stage.id]).filter(Boolean);
+    const problem = getProblemBySlug(submission.problem_id);
+    if (!problem) throw new HttpError(404, "Problema no encontrado.");
 
-  if (!stageResults.length) {
-    throw new HttpError(400, "Primero ejecuta al menos una etapa.");
-  }
+    const stageResults = problem.stages.map((stage) => submission.stage_results[stage.id]).filter(Boolean);
 
-  const allStagesExecuted = stageResults.length === problem.stages.length;
-  const allPassed = allStagesExecuted && stageResults.every((stage) => stage.passed);
+    if (!stageResults.length) {
+      throw new HttpError(400, "Primero ejecuta al menos una etapa.");
+    }
 
-  const averageScore =
-    stageResults.reduce((acc, stage) => acc + Number(stage.stage_score || 0), 0) / stageResults.length;
+    const allStagesExecuted = stageResults.length === problem.stages.length;
+    const allPassed = allStagesExecuted && stageResults.every((stage) => stage.passed);
 
-  const completionFactor = stageResults.length / Math.max(1, problem.stages.length);
-  const finalScore = Math.round(averageScore * completionFactor);
+    const averageScore =
+      stageResults.reduce((acc, stage) => acc + Number(stage.stage_score || 0), 0) / stageResults.length;
 
-  submission.final_score = finalScore;
-  submission.verdict = allPassed ? "accepted" : "wrong_answer";
-  submission.submitted_at = nowIso();
+    const completionFactor = stageResults.length / Math.max(1, problem.stages.length);
+    const finalScore = Math.round(averageScore * completionFactor);
 
-  return {
-    verdict: submission.verdict,
-    final_score: finalScore,
-  };
+    submission.final_score = finalScore;
+    submission.verdict = allPassed ? "accepted" : "wrong_answer";
+    submission.submitted_at = nowIso();
+    submission.updated_at = nowIso();
+
+    return {
+      verdict: submission.verdict,
+      final_score: finalScore,
+    };
+  });
 }
 
 export function sendSubmissionEvents({ userId, submissionId, events = [] }) {
-  const submission = store.findSubmissionByOwner(submissionId, userId);
-  if (!submission) return { ok: false };
+  const normalizedSubmissionId = normalizeSubmissionId(submissionId);
 
-  submission.events.push(...sanitizeEvents(events));
+  const submission = store.findSubmissionByOwner(normalizedSubmissionId, userId);
+  if (!submission) {
+    throw new HttpError(404, "Submission no encontrada.");
+  }
+
+  store.appendSubmissionEvents(submission.id, sanitizeEvents(events));
   return { ok: true };
 }

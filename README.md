@@ -16,8 +16,11 @@ src/
 ├─ server.js             # arranque del servidor
 ├─ config/               # variables de entorno y cliente HTTP
 ├─ data/                 # seeds, store en memoria y catalogo de problemas
+│  └─ problem-catalog/   # normalizacion, loaders y estado del catalogo
 ├─ middleware/           # auth, manejo de errores y contexto por request
 ├─ features/             # modulos de dominio (auth, problems, submissions, etc.)
+│  ├─ admin/             # formatters + validacion + orquestacion
+│  └─ submissions/       # lock + eventos + evaluacion + validacion + service
 └─ utils/                # utilidades compartidas
 ```
 
@@ -26,6 +29,11 @@ src/
 cd backend
 bun install
 bun run dev
+```
+
+Tests:
+```bash
+bun test
 ```
 
 Servidor por defecto: `http://localhost:8000`.
@@ -52,6 +60,7 @@ Bajo prefijo `/api`:
 - `GET /health`
 - `POST /auth/login`
 - `POST /auth/register`
+- `POST /auth/logout` (auth)
 - `GET /problems`
 - `GET /problems/:slug`
 - `GET /problems/tags`
@@ -65,10 +74,16 @@ Bajo prefijo `/api`:
 
 ## Credenciales demo
 - `demo@riwlogi.dev` / `123456`
+- `admin@riwlogi.dev` / `admin123`
 
 ## Notas
 - Persistencia en memoria (suficiente para pruebas locales).
-- El catalogo se carga primero desde `src/data/backend-handoff/*.json` y, si no existe, hace fallback a `problems/*.json`.
+- El catalogo de problemas ignora seeds invalidos y prioriza:
+  - `backend/problems/*.json`
+  - `../frontend/problems/*.json`
+  - `../problems/*.json`
+  - `src/data/backend-handoff/*.json`
+  - fallback interno de ejemplo
 - Si quieres forzar frontend remoto, usa en frontend `.env`:
   - `VITE_API_MODE=remote`
   - `VITE_API_BASE=/api` (solo si frontend y backend comparten origen o existe proxy)

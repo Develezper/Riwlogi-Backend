@@ -1,8 +1,8 @@
-import { login, register } from "./auth.service.js";
+import { login, logout, register } from "./auth.service.js";
 
 export function loginController(req, res) {
   const result = login({
-    identifier: req.body?.email,
+    identifier: req.body?.identifier ?? req.body?.email,
     password: req.body?.password,
   });
 
@@ -19,4 +19,7 @@ export function registerController(req, res) {
   res.status(201).json(result);
 }
 
-
+export function logoutController(req, res) {
+  const payload = logout(req.auth?.token);
+  res.json(payload);
+}

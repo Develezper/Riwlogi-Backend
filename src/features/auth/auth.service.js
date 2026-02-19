@@ -21,12 +21,24 @@ function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export function login({ identifier, password }) {
-  const cleanIdentifier = cleanString(identifier);
+function validateUsername(username) {
+  return /^[a-zA-Z0-9_]+$/.test(username);
+}
+
+function issueSession(userId) {
+  const session = store.createSession(userId);
+  return {
+    access_token: session.token,
+    expires_at: session.expires_at,
+  };
+}
+
+export function login({ identifier, email, password }) {
+  const cleanIdentifier = cleanString(identifier || email);
   const cleanPassword = cleanString(password);
 
   if (!cleanIdentifier || !cleanPassword) {
-    throw new HttpError(400, "Debes enviar email y contraseña.");
+    throw new HttpError(400, "Debes enviar identificador y contraseña.");
   }
 
   const user = store.findUserByIdentifier(cleanIdentifier);
@@ -34,10 +46,8 @@ export function login({ identifier, password }) {
     throw new HttpError(401, "Credenciales inválidas.");
   }
 
-  const token = store.createSession(user.id);
-
   return {
-    access_token: token,
+    ...issueSession(user.id),
     user: toPublicUser(user),
   };
 }
@@ -53,6 +63,14 @@ export function register({ username, email, password }) {
 
   if (cleanUsername.length < 3) {
     throw new HttpError(400, "El username debe tener al menos 3 caracteres.");
+  }
+
+  if (cleanUsername.length > 30) {
+    throw new HttpError(400, "El username no puede superar 30 caracteres.");
+  }
+
+  if (!validateUsername(cleanUsername)) {
+    throw new HttpError(400, "El username solo permite letras, números y guion bajo.");
   }
 
   if (!validateEmail(cleanEmail)) {
@@ -77,10 +95,16 @@ export function register({ username, email, password }) {
     password: cleanPassword,
   });
 
-  const token = store.createSession(user.id);
-
   return {
-    access_token: token,
+    ...issueSession(user.id),
     user: toPublicUser(user),
   };
+}
+
+export function logout(token) {
+  const revoked = store.revokeSession(token);
+  if (!revoked) {
+    throw new HttpError(401, "Sesión inválida o expirada.");
+  }
+  return { ok: true };
 }

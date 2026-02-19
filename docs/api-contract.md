@@ -26,12 +26,13 @@ All JSON requests/responses use `Content-Type: application/json`.
 - `POST /auth/login`
 - Body:
 ```json
-{ "email": "demo@riwlogi.dev", "password": "123456" }
+{ "identifier": "demo@riwlogi.dev", "password": "123456" }
 ```
 - Response:
 ```json
 {
   "access_token": "token_or_jwt",
+  "expires_at": "2026-02-20T10:00:00.000Z",
   "user": {
     "id": "user_1",
     "username": "demo",
@@ -48,6 +49,12 @@ All JSON requests/responses use `Content-Type: application/json`.
 { "username": "demo", "email": "demo@riwlogi.dev", "password": "123456" }
 ```
 - Response: same shape as login.
+
+- `POST /auth/logout` (Auth required)
+- Response:
+```json
+{ "ok": true }
+```
 
 ## Problems
 - `GET /problems?difficulty=1&search=two&tag=Arrays`

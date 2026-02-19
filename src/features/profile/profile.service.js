@@ -1,5 +1,6 @@
 import { getProblemBySlug } from "../../data/problem-catalog.js";
 import { store } from "../../data/store.js";
+import { HttpError } from "../../utils/http-error.js";
 import { buildLeaderboard } from "../leaderboard/leaderboard.service.js";
 
 function toPublicUser(user) {
@@ -32,7 +33,7 @@ function calculateStreak(submissions) {
     cursor.setDate(cursor.getDate() - 1);
   }
 
-  return streak || 1;
+  return streak;
 }
 
 function computeDifficultyStats(problemIds) {
@@ -81,6 +82,10 @@ function formatSubmission(submission) {
 
 export function getProfile(userId) {
   const user = store.findUserById(userId);
+  if (!user) {
+    throw new HttpError(404, "Usuario no encontrado.");
+  }
+
   const submissions = store.listSubmissionsByUser(userId);
 
   const acceptedProblemIds = new Set(

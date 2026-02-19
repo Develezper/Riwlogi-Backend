@@ -1,185 +1,196 @@
+import {
+  createProblem,
+  deleteProblem,
+  getAllProblems,
+  getProblemBySlug,
+  updateProblem,
+} from "../../data/problem-catalog.js";
 import { store } from "../../data/store.js";
-import { getAllProblems, getProblemBySlug } from "../../data/problem-catalog.js";
 import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
+import { slugify, toAdminProblem, toAdminUser } from "./admin.formatters.js";
+import { sanitizeProblemUpdates } from "./admin.validation.js";
 
-function toAdminUser(user, submissions = []) {
-    const userSubmissions = submissions.filter((s) => s.user_id === user.id);
-    const accepted = new Set(
-        userSubmissions
-            .filter((s) => s.verdict === "accepted")
-            .map((s) => s.problem_id)
-    );
+function ensureUniqueProblemId(baseId) {
+  const normalizedBase = slugify(baseId) || `problem-${Date.now()}`;
+  let candidate = normalizedBase;
+  let index = 2;
 
-    return {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role || "user",
-        is_admin: user.role === "admin",
-        display_name: user.display_name || user.username,
-        created_at: user.created_at,
-        submissions_count: userSubmissions.length,
-        solved_count: accepted.size,
-        last_active_at: userSubmissions.length
-            ? userSubmissions[userSubmissions.length - 1].created_at
-            : null,
-    };
-}
+  while (getProblemBySlug(candidate)) {
+    candidate = `${normalizedBase}-${index}`;
+    index += 1;
+  }
 
-function toAdminProblem(problem) {
-    return {
-        ...problem,
-        status: problem.status || "published",
-        source: problem.source || "custom",
-        ai_generated: problem.source === "ai",
-        created_at: problem.created_at || nowIso(),
-        updated_at: problem.updated_at || nowIso(),
-        last_generated_prompt: problem.last_generated_prompt || "",
-    };
+  return candidate;
 }
 
 export function getAdminOverview() {
-    const users = store.getUsers();
-    const submissions = store.listSubmissions();
-    const problems = getAllProblems();
+  const users = store.listUsers();
+  const submissions = store.listSubmissions();
+  const problems = getAllProblems();
 
-    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const activeUsers = new Set(
-        submissions
-            .filter((s) => new Date(s.created_at).getTime() > sevenDaysAgo)
-            .map((s) => s.user_id)
-    );
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const activeUsers = new Set(
+    submissions
+      .filter((submission) => {
+        const timestamp = new Date(submission.submitted_at || submission.created_at).getTime();
+        return Number.isFinite(timestamp) && timestamp > sevenDaysAgo;
+      })
+      .map((submission) => submission.user_id),
+  );
 
-    const acceptedCount = submissions.filter((s) => s.verdict === "accepted").length;
-    const acceptanceRate = submissions.length > 0
-        ? (acceptedCount / submissions.length) * 100
-        : 0;
+  const acceptedCount = submissions.filter((submission) => submission.verdict === "accepted").length;
+  const acceptanceRate = submissions.length > 0 ? (acceptedCount / submissions.length) * 100 : 0;
 
-    const tagCounts = new Map();
-    problems.forEach((problem) => {
-        (problem.tags || []).forEach((tag) => {
-            tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
-        });
+  const tagCounts = new Map();
+  problems.forEach((problem) => {
+    (problem.tags || []).forEach((tag) => {
+      const key = String(tag || "").trim();
+      if (!key) return;
+      tagCounts.set(key, (tagCounts.get(key) || 0) + 1);
     });
+  });
 
-    const topTags = [...tagCounts.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([tag, count]) => ({ tag, count }));
+  const topTags = [...tagCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([tag, count]) => ({ tag, count }));
 
-    const recentActivity = submissions
-        .slice(-20)
-        .reverse()
-        .map((s, index) => ({
-            id: s.id || `activity_${index}`,
-            type: s.verdict === "accepted" ? "submission_accepted" : "submission",
-            label: `${s.problem_title} by user ${s.user_id}`,
-            created_at: s.submitted_at || s.created_at,
-        }));
+  const recentActivity = submissions
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.submitted_at || b.created_at).getTime() -
+        new Date(a.submitted_at || a.created_at).getTime(),
+    )
+    .slice(0, 20)
+    .map((submission, index) => ({
+      id: submission.id || `activity_${index}`,
+      type: submission.verdict === "accepted" ? "submission_accepted" : "submission",
+      label: `${submission.problem_title} by user ${submission.user_id}`,
+      created_at: submission.submitted_at || submission.created_at,
+    }));
 
-    return {
-        kpis: {
-            total_users: users.length,
-            active_users_7d: activeUsers.size,
-            total_problems: problems.length,
-            published_problems: problems.length,
-            draft_problems: 0,
-            total_submissions: submissions.length,
-            accepted_submissions: acceptedCount,
-            acceptance_rate: Math.round(acceptanceRate),
-            ai_generated_problems: 0,
-        },
-        top_tags: topTags,
-        recent_activity: recentActivity,
-        updated_at: nowIso(),
-    };
+  const aiGeneratedProblems = problems.filter((problem) => problem.source === "ai").length;
+  const draftProblems = problems.filter((problem) => problem.status === "draft").length;
+
+  return {
+    kpis: {
+      total_users: users.length,
+      active_users_7d: activeUsers.size,
+      total_problems: problems.length,
+      published_problems: problems.length - draftProblems,
+      draft_problems: draftProblems,
+      total_submissions: submissions.length,
+      accepted_submissions: acceptedCount,
+      acceptance_rate: Number(acceptanceRate.toFixed(1)),
+      ai_generated_problems: aiGeneratedProblems,
+    },
+    top_tags: topTags,
+    recent_activity: recentActivity,
+    updated_at: nowIso(),
+  };
 }
 
 export function listAdminUsers() {
-    const users = store.getUsers();
-    const submissions = store.listSubmissions();
-    return users.map((user) => toAdminUser(user, submissions));
+  const users = store.listUsers();
+  const submissions = store.listSubmissions();
+
+  const submissionsByUser = new Map();
+  submissions.forEach((submission) => {
+    if (!submissionsByUser.has(submission.user_id)) {
+      submissionsByUser.set(submission.user_id, []);
+    }
+    submissionsByUser.get(submission.user_id).push(submission);
+  });
+
+  return users.map((user) => toAdminUser(user, submissionsByUser));
 }
 
-export function deleteAdminUser({ userId }) {
-    const users = store.getUsers();
-    const index = users.findIndex((u) => u.id === userId);
+export function deleteAdminUser({ userId, requestedByUserId }) {
+  const targetUser = store.findUserById(userId);
+  if (!targetUser) {
+    throw new HttpError(404, "Usuario no encontrado.");
+  }
 
-    if (index === -1) {
-        throw new HttpError(404, "Usuario no encontrado.");
-    }
+  if (String(requestedByUserId || "") === targetUser.id) {
+    throw new HttpError(400, "No puedes eliminar tu propio usuario administrador.");
+  }
 
-    users.splice(index, 1);
-    return { ok: true };
+  if (targetUser.role === "admin" && store.countAdmins() <= 1) {
+    throw new HttpError(400, "No puedes eliminar el ultimo administrador.");
+  }
+
+  const deleted = store.deleteUser(targetUser.id);
+  if (!deleted) {
+    throw new HttpError(500, "No se pudo eliminar el usuario.");
+  }
+
+  return {
+    ok: true,
+    deleted_user_id: targetUser.id,
+  };
 }
 
 export function listAdminProblems() {
-    return getAllProblems().map(toAdminProblem);
+  return getAllProblems().map(toAdminProblem);
 }
 
 export function generateAdminProblem({ prompt }) {
-    if (!prompt || typeof prompt !== "string" || prompt.trim().length < 10) {
-        throw new HttpError(400, "El prompt debe tener al menos 10 caracteres.");
-    }
+  const cleanPrompt = String(prompt || "").trim();
+  if (cleanPrompt.length < 10) {
+    throw new HttpError(400, "El prompt debe tener al menos 10 caracteres.");
+  }
 
-    // Mock: en producción integrarías con una API de IA
-    const mockProblem = {
-        id: `ai-generated-${Date.now()}`,
-        slug: `ai-generated-${Date.now()}`,
-        title: "AI Generated Problem (Mock)",
-        difficulty: 2,
-        tags: ["ai-generated"],
-        acceptance: 0,
-        submissions: 0,
-        stages_count: 1,
-        statement_md: "## AI Generated Problem\n\nThis is a mock problem generated from the prompt.",
-        starter_code: {
-            python: "def solve():\n    # AI generated solution\n    pass",
-            javascript: "function solve() {\n  // AI generated solution\n}",
-        },
-        stages: [
-            {
-                id: `ai-stage-${Date.now()}`,
-                stage_index: 1,
-                prompt_md: "Solve the AI-generated challenge.",
-                visible_tests: [],
-                hidden_count: 0,
-            },
-        ],
-        status: "draft",
-        source: "ai",
-        ai_generated: true,
-        last_generated_prompt: prompt,
-        created_at: nowIso(),
-        updated_at: nowIso(),
-    };
+  const titleSource = cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
+  const title = titleSource.slice(0, 90);
+  const baseId = slugify(title) || "ai-generated-problem";
+  const problemId = ensureUniqueProblemId(baseId.startsWith("ai-") ? baseId : `ai-${baseId}`);
 
-    return mockProblem;
+  const createdProblem = createProblem({
+    id: problemId,
+    slug: problemId,
+    title,
+    difficulty: 2,
+    tags: ["ai-generated"],
+    acceptance: 0,
+    submissions: 0,
+    statement_md: `## AI Generated Problem\n\nPrompt:\n${cleanPrompt}`,
+    starter_code: {
+      python: "def solve():\n    # Write your solution here\n    pass",
+      javascript: "function solve() {\n  // Write your solution here\n}",
+      typescript: "function solve(): void {\n}",
+    },
+    stages: [
+      {
+        id: `${problemId}-stage-1`,
+        stage_index: 1,
+        prompt_md: "Implement the requested solution.",
+        visible_tests: [],
+        hidden_count: 0,
+      },
+    ],
+    stages_count: 1,
+    status: "draft",
+    source: "ai",
+    last_generated_prompt: cleanPrompt,
+    created_at: nowIso(),
+    updated_at: nowIso(),
+  });
+
+  return toAdminProblem(createdProblem);
 }
 
 export function updateAdminProblem({ problemId, updates }) {
-    const problem = getProblemBySlug(problemId);
-
-    if (!problem) {
-        throw new HttpError(404, "Problema no encontrado.");
-    }
-
-    // Mock: en producción actualizarías la DB
-    return {
-        ...problem,
-        ...updates,
-        updated_at: nowIso(),
-    };
+  const sanitizedUpdates = sanitizeProblemUpdates(updates);
+  const updated = updateProblem(problemId, sanitizedUpdates);
+  return toAdminProblem(updated);
 }
 
 export function deleteAdminProblem({ problemId }) {
-    const problem = getProblemBySlug(problemId);
-
-    if (!problem) {
-        throw new HttpError(404, "Problema no encontrado.");
-    }
-
-    // Mock: en producción eliminarías de la DB
-    return { ok: true };
+  const removed = deleteProblem(problemId);
+  return {
+    ok: true,
+    deleted_problem_id: removed.id,
+  };
 }

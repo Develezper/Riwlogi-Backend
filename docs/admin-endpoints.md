@@ -23,7 +23,7 @@ Obtiene estadísticas generales del sistema.
 
 **Request:**
 ```bash
-curl http://localhost:3000/api/admin/overview \
+curl http://localhost:8000/api/admin/overview \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -67,7 +67,7 @@ Lista todos los usuarios del sistema con estadísticas.
 
 **Request:**
 ```bash
-curl http://localhost:3000/api/admin/users \
+curl http://localhost:8000/api/admin/users \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -111,7 +111,7 @@ Elimina un usuario del sistema.
 
 **Request:**
 ```bash
-curl -X DELETE http://localhost:3000/api/admin/users/user_demo \
+curl -X DELETE http://localhost:8000/api/admin/users/user_demo \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -130,7 +130,7 @@ Lista todos los problemas con información administrativa.
 
 **Request:**
 ```bash
-curl http://localhost:3000/api/admin/problems \
+curl http://localhost:8000/api/admin/problems \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -165,11 +165,11 @@ curl http://localhost:3000/api/admin/problems \
 
 ### 5. POST /api/admin/problems/generate
 
-Genera un nuevo problema usando IA (actualmente mock).
+Genera un nuevo problema en memoria a partir de un prompt.
 
 **Request:**
 ```bash
-curl -X POST http://localhost:3000/api/admin/problems/generate \
+curl -X POST http://localhost:8000/api/admin/problems/generate \
   -H "Authorization: Bearer <admin_token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -183,13 +183,13 @@ curl -X POST http://localhost:3000/api/admin/problems/generate \
   "item": {
     "id": "ai-generated-1708257600000",
     "slug": "ai-generated-1708257600000",
-    "title": "AI Generated Problem (Mock)",
+    "title": "AI Generated Problem",
     "difficulty": 2,
     "tags": ["ai-generated"],
     "acceptance": 0,
     "submissions": 0,
     "stages_count": 1,
-    "statement_md": "## AI Generated Problem\n\nThis is a mock problem...",
+    "statement_md": "## AI Generated Problem\n\nPrompt: ...",
     "starter_code": {
       "python": "def solve():\n    # AI generated solution\n    pass",
       "javascript": "function solve() {\n  // AI generated solution\n}"
@@ -213,7 +213,7 @@ Actualiza un problema existente.
 
 **Request:**
 ```bash
-curl -X PATCH http://localhost:3000/api/admin/problems/two-sum \
+curl -X PATCH http://localhost:8000/api/admin/problems/two-sum \
   -H "Authorization: Bearer <admin_token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -245,7 +245,7 @@ Elimina un problema del sistema.
 
 **Request:**
 ```bash
-curl -X DELETE http://localhost:3000/api/admin/problems/two-sum \
+curl -X DELETE http://localhost:8000/api/admin/problems/two-sum \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -296,25 +296,25 @@ curl -X DELETE http://localhost:3000/api/admin/problems/two-sum \
 
 ```bash
 # 1. Login como admin
-TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
+TOKEN=$(curl -s -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@riwlogi.dev","password":"admin123"}' \
   | jq -r '.access_token')
 
 # 2. Ver estadísticas
-curl http://localhost:3000/api/admin/overview \
+curl http://localhost:8000/api/admin/overview \
   -H "Authorization: Bearer $TOKEN"
 
 # 3. Listar usuarios
-curl http://localhost:3000/api/admin/users \
+curl http://localhost:8000/api/admin/users \
   -H "Authorization: Bearer $TOKEN"
 
 # 4. Listar problemas
-curl http://localhost:3000/api/admin/problems \
+curl http://localhost:8000/api/admin/problems \
   -H "Authorization: Bearer $TOKEN"
 
 # 5. Generar problema con IA
-curl -X POST http://localhost:3000/api/admin/problems/generate \
+curl -X POST http://localhost:8000/api/admin/problems/generate \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"prompt":"Create a beginner-friendly array problem"}'
@@ -325,5 +325,5 @@ curl -X POST http://localhost:3000/api/admin/problems/generate \
 ## Notas de implementación
 
 - **Persistencia**: Actualmente usa `InMemoryStore`. Los cambios se pierden al reiniciar.
-- **Generación IA**: El endpoint `POST /problems/generate` es un mock. Para producción, integrar con API de IA real.
-- **Eliminaciones**: Las eliminaciones son soft-deletes en memoria. En producción, implementar cascadas y validaciones adicionales.
+- **Generación IA**: El endpoint `POST /problems/generate` crea un borrador en memoria a partir del prompt.
+- **Eliminaciones**: Las eliminaciones son en memoria y no persisten tras reiniciar el backend.

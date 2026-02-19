@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireRole } from "../../middleware/auth.js";
 import {
     deleteAdminProblemController,
     deleteAdminUserController,
@@ -10,6 +11,7 @@ import {
 } from "./admin.controller.js";
 
 const router = Router();
+router.use(requireRole("admin"));
 
 router.get("/overview", getAdminOverviewController);
 router.get("/users", listAdminUsersController);

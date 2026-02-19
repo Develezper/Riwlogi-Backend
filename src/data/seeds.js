@@ -79,6 +79,31 @@ function normalizeUsers(items) {
     .filter((entry) => entry.id && entry.username && entry.email && entry.password);
 }
 
+function mergeUsers(baseUsers, extraUsers) {
+  const mergedByEmail = new Map();
+
+  [...baseUsers, ...extraUsers].forEach((user) => {
+    const key = String(user.email || "").trim().toLowerCase();
+    if (!key) return;
+
+    if (!mergedByEmail.has(key)) {
+      mergedByEmail.set(key, user);
+      return;
+    }
+
+    const current = mergedByEmail.get(key);
+    mergedByEmail.set(key, {
+      ...current,
+      ...user,
+      role: user.role || current.role || "user",
+      password: user.password || current.password,
+      display_name: user.display_name || current.display_name || user.username,
+    });
+  });
+
+  return [...mergedByEmail.values()];
+}
+
 function normalizeLeaderboard(items) {
   return items
     .map((entry) => ({
@@ -93,5 +118,5 @@ function normalizeLeaderboard(items) {
 const handoffUsers = normalizeUsers(readHandoffItems("users.seed.json") || []);
 const handoffLeaderboard = normalizeLeaderboard(readHandoffItems("leaderboard.seed.json") || []);
 
-export const DEFAULT_USERS = handoffUsers.length ? handoffUsers : FALLBACK_USERS;
+export const DEFAULT_USERS = mergeUsers(FALLBACK_USERS, handoffUsers);
 export const LEADERBOARD_SEED = handoffLeaderboard.length ? handoffLeaderboard : FALLBACK_LEADERBOARD;
