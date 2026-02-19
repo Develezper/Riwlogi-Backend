@@ -105,6 +105,40 @@ function sanitizeEvents(events) {
   }));
 }
 
+function validateLanguage(code, language) {
+  const normalizedCode = String(code || "").trim();
+  const normalizedLang = String(language || "").toLowerCase();
+
+  if (!normalizedCode) {
+    throw new HttpError(400, "El código no puede estar vacío.");
+  }
+
+  // Patrones básicos para detectar el lenguaje
+  const pythonPatterns = /^(def\s|class\s|import\s|from\s|@|if\s.*:|for\s.*:|while\s.*:|try:|except:|#)/m;
+  const jsPatterns = /^(function\s|const\s|let\s|var\s|class\s|import\s|export\s|=>|\/\/|\/\*)/m;
+  const tsPatterns = /^(function\s|const\s|let\s|var\s|class\s|import\s|export\s|interface\s|type\s|enum\s|=>|:\s*(string|number|boolean|any|void|Array|Promise)|\/\/|\/\*)/m;
+
+  if (normalizedLang === "python") {
+    if (!pythonPatterns.test(normalizedCode)) {
+      throw new HttpError(400, "El código no parece estar escrito en Python. Verifica que uses la sintaxis correcta (def, class, etc.).");
+    }
+  } else if (normalizedLang === "javascript") {
+    if (!jsPatterns.test(normalizedCode)) {
+      throw new HttpError(400, "El código no parece estar escrito en JavaScript. Verifica que uses la sintaxis correcta (function, const, etc.).");
+    }
+    // Verificar que NO tenga anotaciones de tipos (sería TypeScript)
+    if (tsPatterns.test(normalizedCode) && /:\s*(string|number|boolean|any|void|Array|Promise|interface|type\s)/.test(normalizedCode)) {
+      throw new HttpError(400, "Detectamos anotaciones de tipos. Si estás usando TypeScript, selecciona TypeScript como lenguaje.");
+    }
+  } else if (normalizedLang === "typescript") {
+    if (!tsPatterns.test(normalizedCode)) {
+      throw new HttpError(400, "El código no parece estar escrito en TypeScript. Verifica que uses la sintaxis correcta.");
+    }
+  }
+
+  return true;
+}
+
 export function startSubmission({ userId, problemId, language = "python" }) {
   const problem = getProblemBySlug(problemId);
   if (!problem) throw new HttpError(400, "Problema inválido.");
@@ -136,6 +170,9 @@ export async function runSubmission({ userId, submissionId, stageId, code, event
   if (!stage) {
     throw new HttpError(400, "Stage inválido.");
   }
+
+  // Validar que el código esté en el lenguaje declarado
+  validateLanguage(code, submission.language);
 
   const cleanEvents = sanitizeEvents(events);
   const result = evaluateStage(code, stage);

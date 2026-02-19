@@ -8,9 +8,9 @@
         "axios": "^1.13.2",
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",
-        "express": "^5.1.0",
-      },
-    },
+        "express": "^5.1.0"
+      }
+    }
   },
   "packages": {
     "accepts": ["accepts@2.0.0", "", { "dependencies": { "mime-types": "^3.0.0", "negotiator": "^1.0.0" } }, "sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng=="],
