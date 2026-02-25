@@ -117,7 +117,7 @@ Response `200`:
 Body:
 
 ```json
-{ "identifier": "demo@riwlogi.dev", "password": "123456" }
+{ "email": "demo@riwlogi.dev", "password": "123456" }
 ```
 
 Notas:
@@ -134,8 +134,7 @@ Response `200`:
     "id": "user_demo",
     "username": "demo",
     "email": "demo@riwlogi.dev",
-    "role": "user",
-    "display_name": "demo",
+    "display_name": "Demo",
     "created_at": "2026-01-01T00:00:00.000Z"
   }
 }
@@ -146,7 +145,7 @@ Response `200`:
 Body:
 
 ```json
-{ "username": "new_user", "email": "new.user@example.com", "password": "123456" }
+{ "username": "demo", "email": "demo@riwlogi.dev", "password": "123456" }
 ```
 
 Response `201`: mismo shape que login.
@@ -381,7 +380,7 @@ Response `200`:
     "id": "user_1",
     "username": "demo",
     "email": "demo@riwlogi.dev",
-    "display_name": "demo",
+    "display_name": "Demo",
     "created_at": "2026-01-01T00:00:00.000Z"
   },
   "stats": {

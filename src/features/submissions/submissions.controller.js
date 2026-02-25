@@ -27,8 +27,8 @@ export async function runSubmissionController(req, res) {
   res.json({ result });
 }
 
-export async function submitSubmissionController(req, res) {
-  const payload = await submitSubmission({
+export function submitSubmissionController(req, res) {
+  const payload = submitSubmission({
     userId: req.auth.userId,
     submissionId: req.params?.id,
   });

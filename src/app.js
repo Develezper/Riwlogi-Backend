@@ -7,6 +7,7 @@ import { notFound } from "./middleware/not-found.js";
 import { requestContext } from "./middleware/request-context.js";
 
 const app = express();
+app.disable("x-powered-by"); 
 
 const corsOrigins = env.CORS_ORIGINS;
 const corsOptions = {

@@ -1,16 +1,13 @@
 import { getProblem, listProblems, listTags } from "./problems.service.js";
-import { paginateItems, parsePaginationQuery } from "../../utils/pagination.js";
 
 export function listProblemsController(req, res) {
-  const allItems = listProblems({
+  const items = listProblems({
     difficulty: req.query?.difficulty,
     search: req.query?.search,
     tag: req.query?.tag,
   });
-  const pagination = parsePaginationQuery(req.query);
-  const payload = paginateItems(allItems, pagination);
 
-  res.json(payload);
+  res.json({ items });
 }
 
 export function getProblemController(req, res) {

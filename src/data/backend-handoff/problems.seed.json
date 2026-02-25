@@ -1,160 +1,89 @@
 {
   "items": [
     {
-      "id": "reverse-string",
-      "slug": "reverse-string",
-      "title": "Reverse String",
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
       "difficulty": 1,
       "tags": [
-        "strings",
-        "two-pointers"
+        "Arrays",
+        "Binary Search",
+        "Dynamic Programming",
+        "Hash Table",
+        "Sorting",
+        "Stack",
+        "Strings",
+        "Trees"
       ],
-      "acceptance": 72,
-      "submissions": 7430,
+      "acceptance": 0,
+      "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "## Description\nWrite a function that reverses a string represented as an array of characters.",
+      "statement_md": "",
       "starter_code": {
-        "python": "def solve(chars):\n    # Write your solution here\n    pass",
-        "javascript": "function solve(chars) {\n  // Write your solution here\n}",
-        "typescript": "function solve(chars: string[]): void {\n}"
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
       },
-      "stages": [
-        {
-          "id": "reverse-string-stage-1",
-          "stage_index": 1,
-          "prompt_md": "Reverse the input array in-place.",
-          "time_limit_ms": 1200,
-          "tests": [
-            {
-              "input_text": "['h','e','l','l','o']",
-              "expected_text": "['o','l','l','e','h']",
-              "is_hidden": false
-            }
-          ],
-          "visible_tests": [
-            {
-              "input_text": "['h','e','l','l','o']",
-              "expected_text": "['o','l','l','e','h']"
-            }
-          ],
-          "hidden_count": 2
-        }
-      ],
-      "stages_count": 1,
-      "status": "published",
-      "source": "fallback",
-      "last_generated_prompt": "",
-      "created_at": "2026-01-01T00:00:00.000Z",
-      "updated_at": "2026-01-01T00:00:00.000Z"
+      "stages": [],
+      "stages_count": 0
     },
     {
-      "id": "two-sum",
-      "slug": "two-sum",
-      "title": "Two Sum",
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
       "difficulty": 1,
-      "tags": [
-        "arrays",
-        "hash-table"
-      ],
-      "acceptance": 49.2,
-      "submissions": 14523,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "## Description\nGiven an array of integers nums and an integer target, return indices of two numbers such that they add up to target.",
+      "statement_md": "",
       "starter_code": {
-        "python": "def solve(nums, target):\n    # Write your solution here\n    pass",
-        "javascript": "function solve(nums, target) {\n  // Write your solution here\n}",
-        "typescript": "function solve(nums: number[], target: number): number[] {\n  return [];\n}"
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
       },
-      "stages": [
-        {
-          "id": "two-sum-stage-1",
-          "stage_index": 1,
-          "prompt_md": "Solve the basic two-sum case.",
-          "time_limit_ms": 1200,
-          "tests": [
-            {
-              "input_text": "[2,7,11,15], 9",
-              "expected_text": "[0,1]",
-              "is_hidden": false
-            }
-          ],
-          "visible_tests": [
-            {
-              "input_text": "[2,7,11,15], 9",
-              "expected_text": "[0,1]"
-            }
-          ],
-          "hidden_count": 3
-        }
-      ],
-      "stages_count": 1,
-      "status": "published",
-      "source": "fallback",
-      "last_generated_prompt": "",
-      "created_at": "2026-01-01T00:00:00.000Z",
-      "updated_at": "2026-01-01T00:00:00.000Z"
+      "stages": [],
+      "stages_count": 0
     },
     {
-      "id": "valid-parentheses",
-      "slug": "valid-parentheses",
-      "title": "Valid Parentheses",
-      "difficulty": 2,
-      "tags": [
-        "stack",
-        "strings"
-      ],
-      "acceptance": 41,
-      "submissions": 9540,
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "## Description\nGiven a string containing only brackets, determine whether it is valid.",
+      "statement_md": "",
       "starter_code": {
-        "python": "def solve(s):\n    # Write your solution here\n    pass",
-        "javascript": "function solve(s) {\n  // Write your solution here\n}",
-        "typescript": "function solve(s: string): boolean {\n  return false;\n}"
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
       },
-      "stages": [
-        {
-          "id": "valid-parentheses-stage-1",
-          "stage_index": 1,
-          "prompt_md": "Validate small bracket strings.",
-          "time_limit_ms": 1200,
-          "tests": [
-            {
-              "input_text": "()",
-              "expected_text": "true",
-              "is_hidden": false
-            },
-            {
-              "input_text": "(]",
-              "expected_text": "false",
-              "is_hidden": false
-            }
-          ],
-          "visible_tests": [
-            {
-              "input_text": "()",
-              "expected_text": "true"
-            },
-            {
-              "input_text": "(]",
-              "expected_text": "false"
-            }
-          ],
-          "hidden_count": 4
-        }
-      ],
-      "stages_count": 1,
-      "status": "published",
-      "source": "fallback",
-      "last_generated_prompt": "",
-      "created_at": "2026-01-01T00:00:00.000Z",
-      "updated_at": "2026-01-01T00:00:00.000Z"
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
     }
   ]
 }
