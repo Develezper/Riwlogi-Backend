@@ -14,6 +14,24 @@ function toProblemSummary(problem) {
   };
 }
 
+function toPublicStage(stage) {
+  return {
+    id: stage.id,
+    stage_index: stage.stage_index,
+    prompt_md: stage.prompt_md,
+    time_limit_ms: stage.time_limit_ms,
+    hidden_count: stage.hidden_count,
+    visible_tests: Array.isArray(stage.visible_tests) ? stage.visible_tests : [],
+  };
+}
+
+function toPublicProblem(problem) {
+  return {
+    ...problem,
+    stages: Array.isArray(problem.stages) ? problem.stages.map(toPublicStage) : [],
+  };
+}
+
 export function listProblems({ difficulty, search, tag } = {}) {
   const parsedDifficulty = difficulty ? Number(difficulty) : null;
   const normalizedSearch = String(search || "").trim().toLowerCase();
@@ -36,7 +54,7 @@ export function getProblem(slug) {
     throw new HttpError(404, "Problema no encontrado.");
   }
 
-  return problem;
+  return toPublicProblem(problem);
 }
 
 export function listTags() {

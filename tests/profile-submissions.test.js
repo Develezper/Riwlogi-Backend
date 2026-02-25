@@ -9,23 +9,22 @@ import {
 import { HttpError } from "../src/utils/http-error.js";
 
 beforeEach(() => {
-  store.reset();
-  resetProblemCatalog();
+  return Promise.all([store.reset(), resetProblemCatalog()]);
 });
 
 describe("profile and submissions", () => {
-  it("returns streak 0 when user has no activity today", () => {
-    const demoUser = store.findUserByIdentifier("demo@riwlogi.dev");
-    const profile = getProfile(demoUser.id);
+  it("returns streak 0 when user has no activity today", async () => {
+    const demoUser = await store.findUserByIdentifier("demo@riwlogi.dev");
+    const profile = await getProfile(demoUser.id);
 
     expect(profile.streak).toBe(0);
   });
 
-  it("returns 404 when sending events to an unknown submission", () => {
-    const demoUser = store.findUserByIdentifier("demo@riwlogi.dev");
+  it("returns 404 when sending events to an unknown submission", async () => {
+    const demoUser = await store.findUserByIdentifier("demo@riwlogi.dev");
 
     try {
-      sendSubmissionEvents({
+      await sendSubmissionEvents({
         userId: demoUser.id,
         submissionId: "sub_missing",
         events: [{ type: "key", char_count: 10 }],
@@ -37,9 +36,9 @@ describe("profile and submissions", () => {
     }
   });
 
-  it("caps submission events growth", () => {
-    const demoUser = store.findUserByIdentifier("demo@riwlogi.dev");
-    const started = startSubmission({
+  it("caps submission events growth", async () => {
+    const demoUser = await store.findUserByIdentifier("demo@riwlogi.dev");
+    const started = await startSubmission({
       userId: demoUser.id,
       problemId: "two-sum",
       language: "python",
@@ -52,14 +51,14 @@ describe("profile and submissions", () => {
     }));
 
     for (let index = 0; index < 20; index += 1) {
-      sendSubmissionEvents({
+      await sendSubmissionEvents({
         userId: demoUser.id,
         submissionId: started.submission_id,
         events,
       });
     }
 
-    const submission = store.findSubmissionByOwner(started.submission_id, demoUser.id);
+    const submission = await store.findSubmissionByOwner(started.submission_id, demoUser.id);
     expect(submission).not.toBeNull();
     expect(submission.events.length).toBeLessThanOrEqual(2000);
   });

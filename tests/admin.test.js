@@ -11,8 +11,7 @@ import {
 import { HttpError } from "../src/utils/http-error.js";
 
 beforeEach(() => {
-  store.reset();
-  resetProblemCatalog();
+  return Promise.all([store.reset(), resetProblemCatalog()]);
 });
 
 describe("admin services", () => {
@@ -44,11 +43,11 @@ describe("admin services", () => {
     expect(listedAfterDelete).toBeUndefined();
   });
 
-  it("prevents deleting yourself as admin", () => {
-    const admin = store.findUserByIdentifier("admin@riwlogi.dev");
+  it("prevents deleting yourself as admin", async () => {
+    const admin = await store.findUserByIdentifier("admin@riwlogi.dev");
 
     try {
-      deleteAdminUser({
+      await deleteAdminUser({
         userId: admin.id,
         requestedByUserId: admin.id,
       });

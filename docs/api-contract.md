@@ -2,6 +2,10 @@
 
 Contrato actualizado según el backend actual.
 
+Fuente de verdad de contrato:
+- OpenAPI JSON runtime: `GET /api/openapi.json`
+- Export estático: `docs/openapi.json` (generado con `bun run export:openapi`)
+
 ## 1. Base y Convenciones
 
 - Base API por defecto: `/api`
@@ -45,6 +49,8 @@ Formato estándar:
 - `403`: autenticado pero sin permisos.
 - `404`: recurso no encontrado.
 - `409`: conflicto (username/email duplicado, slug en uso).
+- `429`: rate limit excedido.
+- `503`: servicio no listo (readiness check).
 - `500`: error interno.
 
 ### Error `400` example (validación)
@@ -73,6 +79,18 @@ Response `401`:
 
 ```json
 { "message": "Debes iniciar sesión para continuar." }
+```
+
+### Error `429` example (rate limit)
+
+Request:
+
+`POST /api/auth/login` (demasiados intentos en la ventana configurada)
+
+Response `429`:
+
+```json
+{ "message": "Demasiados intentos de autenticación. Intenta nuevamente más tarde." }
 ```
 
 ## 3. Health
@@ -110,6 +128,64 @@ Response `200`:
 { "ok": true, "status": "ok" }
 ```
 
+### GET /api/health/live
+
+Response `200`:
+
+```json
+{
+  "ok": true,
+  "status": "alive",
+  "service": "riwlogi-backend",
+  "environment": "development",
+  "timestamp": "2026-02-25T12:00:00.000Z",
+  "uptime_s": 123,
+  "checks": { "process": "up", "event_loop": "up" }
+}
+```
+
+### GET /api/health/ready
+
+Response `200` (listo):
+
+```json
+{
+  "ok": true,
+  "status": "ready",
+  "service": "riwlogi-backend",
+  "environment": "development",
+  "timestamp": "2026-02-25T12:00:00.000Z",
+  "uptime_s": 123,
+  "checks": {
+    "store": {
+      "ok": true,
+      "provider": "memory",
+      "checks": { "sessions_cache": "up", "submissions_cache": "up" }
+    }
+  }
+}
+```
+
+Response `503` (no listo):
+
+```json
+{
+  "ok": false,
+  "status": "not_ready",
+  "service": "riwlogi-backend",
+  "environment": "production",
+  "timestamp": "2026-02-25T12:00:00.000Z",
+  "uptime_s": 4,
+  "checks": {
+    "store": {
+      "ok": false,
+      "provider": "postgres",
+      "error": "getaddrinfo ECONNREFUSED"
+    }
+  }
+}
+```
+
 ## 4. Auth
 
 ### POST /api/auth/login
@@ -117,7 +193,7 @@ Response `200`:
 Body:
 
 ```json
-{ "email": "demo@riwlogi.dev", "password": "123456" }
+{ "identifier": "demo@riwlogi.dev", "password": "123456" }
 ```
 
 Notas:
@@ -134,6 +210,7 @@ Response `200`:
     "id": "user_demo",
     "username": "demo",
     "email": "demo@riwlogi.dev",
+    "role": "user",
     "display_name": "Demo",
     "created_at": "2026-01-01T00:00:00.000Z"
   }

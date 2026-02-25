@@ -5,8 +5,8 @@ import {
   submitSubmission,
 } from "./submissions.service.js";
 
-export function startSubmissionController(req, res) {
-  const payload = startSubmission({
+export async function startSubmissionController(req, res) {
+  const payload = await startSubmission({
     userId: req.auth.userId,
     problemId: req.body?.problem_id,
     language: req.body?.language,
@@ -27,8 +27,8 @@ export async function runSubmissionController(req, res) {
   res.json({ result });
 }
 
-export function submitSubmissionController(req, res) {
-  const payload = submitSubmission({
+export async function submitSubmissionController(req, res) {
+  const payload = await submitSubmission({
     userId: req.auth.userId,
     submissionId: req.params?.id,
   });
@@ -36,8 +36,8 @@ export function submitSubmissionController(req, res) {
   res.json(payload);
 }
 
-export function sendEventsController(req, res) {
-  const payload = sendSubmissionEvents({
+export async function sendEventsController(req, res) {
+  const payload = await sendSubmissionEvents({
     userId: req.auth.userId,
     submissionId: req.params?.id,
     events: req.body?.events,

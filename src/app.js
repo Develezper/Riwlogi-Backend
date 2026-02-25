@@ -1,13 +1,13 @@
 import cors from "cors";
 import express from "express";
 import { env } from "./config/env.js";
+import { httpLogger } from "./config/logger.js";
+import { helmetMiddleware } from "./config/security.js";
 import { apiRoutes } from "./api.routes.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { notFound } from "./middleware/not-found.js";
-import { requestContext } from "./middleware/request-context.js";
 
 const app = express();
-app.disable("x-powered-by"); 
 
 const corsOrigins = env.CORS_ORIGINS;
 const corsOptions = {
@@ -27,14 +27,15 @@ const corsOptions = {
 };
 
 app.disable("x-powered-by");
-app.use(requestContext);
+app.set("trust proxy", env.TRUST_PROXY);
+app.use(httpLogger);
+app.use(helmetMiddleware);
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => {
   res.json({ ok: true, service: "riwlogi-backend", docs: `${env.API_PREFIX}/health` });
 });
-
 
 app.use(env.API_PREFIX, apiRoutes);
 

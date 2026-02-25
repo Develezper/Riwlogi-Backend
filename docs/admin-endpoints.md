@@ -65,9 +65,13 @@ curl http://localhost:8000/api/admin/overview \
 
 Lista todos los usuarios del sistema con estadísticas.
 
+Query params opcionales:
+- `page` (entero > 0, default `1`)
+- `limit` (entero > 0, default `20`, máximo `100`)
+
 **Request:**
 ```bash
-curl http://localhost:8000/api/admin/users \
+curl "http://localhost:8000/api/admin/users?page=1&limit=20" \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -99,7 +103,13 @@ curl http://localhost:8000/api/admin/users \
       "solved_count": 3,
       "last_active_at": "2026-02-18T10:00:00.000Z"
     }
-  ]
+  ],
+  "page": 1,
+  "limit": 20,
+  "total": 2,
+  "total_pages": 1,
+  "has_prev": false,
+  "has_next": false
 }
 ```
 
@@ -282,7 +292,7 @@ curl -X DELETE http://localhost:8000/api/admin/problems/two-sum \
 ### 403 Forbidden
 ```json
 {
-  "message": "Acceso denegado."
+  "message": "No tienes permisos para realizar esta acción."
 }
 ```
 

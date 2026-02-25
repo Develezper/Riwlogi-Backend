@@ -25,9 +25,8 @@ function ensureUniqueProblemId(baseId) {
   return candidate;
 }
 
-export function getAdminOverview() {
-  const users = store.listUsers();
-  const submissions = store.listSubmissions();
+export async function getAdminOverview() {
+  const [users, submissions] = await Promise.all([store.listUsers(), store.listSubmissions()]);
   const problems = getAllProblems();
 
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -93,9 +92,8 @@ export function getAdminOverview() {
   };
 }
 
-export function listAdminUsers() {
-  const users = store.listUsers();
-  const submissions = store.listSubmissions();
+export async function listAdminUsers() {
+  const [users, submissions] = await Promise.all([store.listUsers(), store.listSubmissions()]);
 
   const submissionsByUser = new Map();
   submissions.forEach((submission) => {
@@ -108,8 +106,8 @@ export function listAdminUsers() {
   return users.map((user) => toAdminUser(user, submissionsByUser));
 }
 
-export function deleteAdminUser({ userId, requestedByUserId }) {
-  const targetUser = store.findUserById(userId);
+export async function deleteAdminUser({ userId, requestedByUserId }) {
+  const targetUser = await store.findUserById(userId);
   if (!targetUser) {
     throw new HttpError(404, "Usuario no encontrado.");
   }
@@ -118,11 +116,11 @@ export function deleteAdminUser({ userId, requestedByUserId }) {
     throw new HttpError(400, "No puedes eliminar tu propio usuario administrador.");
   }
 
-  if (targetUser.role === "admin" && store.countAdmins() <= 1) {
+  if (targetUser.role === "admin" && (await store.countAdmins()) <= 1) {
     throw new HttpError(400, "No puedes eliminar el ultimo administrador.");
   }
 
-  const deleted = store.deleteUser(targetUser.id);
+  const deleted = await store.deleteUser(targetUser.id);
   if (!deleted) {
     throw new HttpError(500, "No se pudo eliminar el usuario.");
   }

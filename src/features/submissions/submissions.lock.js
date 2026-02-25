@@ -5,7 +5,7 @@ export function withSubmissionLock(submissionId, task) {
   const previous = submissionLocks.get(key) || Promise.resolve();
 
   const next = previous.catch(() => {}).then(task);
-  const tracked = next.finally(() => {
+  const tracked = next.catch(() => {}).finally(() => {
     if (submissionLocks.get(key) === tracked) {
       submissionLocks.delete(key);
     }

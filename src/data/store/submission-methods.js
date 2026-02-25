@@ -1,4 +1,3 @@
-import { env } from "../../config/env.js";
 import { uid } from "../../utils/id.js";
 import { nowIso } from "../../utils/time.js";
 import { toId } from "./utils.js";
@@ -45,19 +44,23 @@ export const submissionStoreMethods = {
     return submission.user_id === toId(userId) ? submission : null;
   },
 
-  appendSubmissionEvents(submissionId, events = []) {
+  updateSubmission(submissionId, updates = {}) {
     const submission = this.findSubmission(submissionId);
-    if (!submission) return false;
+    if (!submission) return null;
 
-    if (Array.isArray(events) && events.length > 0) {
-      submission.events.push(...events);
-      if (submission.events.length > env.MAX_EVENTS_PER_SUBMISSION) {
-        submission.events.splice(0, submission.events.length - env.MAX_EVENTS_PER_SUBMISSION);
-      }
-      submission.updated_at = nowIso();
-    }
+    submission.code = String(updates.code ?? submission.code ?? "");
+    submission.stage_results =
+      updates.stage_results && typeof updates.stage_results === "object"
+        ? updates.stage_results
+        : submission.stage_results || {};
+    submission.runtime_ms = Number(updates.runtime_ms ?? submission.runtime_ms ?? 0);
+    submission.final_score = Number(updates.final_score ?? submission.final_score ?? 0);
+    submission.verdict = String(updates.verdict ?? submission.verdict ?? "pending");
+    submission.events = Array.isArray(updates.events) ? updates.events : submission.events || [];
+    submission.updated_at = String(updates.updated_at || nowIso());
+    submission.submitted_at = updates.submitted_at ?? submission.submitted_at ?? null;
 
-    return true;
+    return submission;
   },
 
   listSubmissions() {

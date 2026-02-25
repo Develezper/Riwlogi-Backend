@@ -1,5 +1,7 @@
 import { getProblemBySlug } from "../../data/problem-catalog.js";
 import { store } from "../../data/store.js";
+import { HttpError } from "../../utils/http-error.js";
+import { calculateConsecutiveDailyStreak } from "../../utils/streak.js";
 import { buildLeaderboard } from "../leaderboard/leaderboard.service.js";
 
 function toPublicUser(user) {
@@ -10,29 +12,6 @@ function toPublicUser(user) {
     display_name: user.display_name || user.username,
     created_at: user.created_at,
   };
-}
-
-function calculateStreak(submissions) {
-  if (!submissions.length) return 0;
-
-  const days = new Set(
-    submissions.map((submission) => {
-      const date = new Date(submission.submitted_at || submission.created_at);
-      return date.toISOString().slice(0, 10);
-    }),
-  );
-
-  let streak = 0;
-  const cursor = new Date();
-
-  for (let index = 0; index < 60; index += 1) {
-    const key = cursor.toISOString().slice(0, 10);
-    if (!days.has(key)) break;
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak || 1;
 }
 
 function computeDifficultyStats(problemIds) {
@@ -79,9 +58,13 @@ function formatSubmission(submission) {
   };
 }
 
-export function getProfile(userId) {
-  const user = store.findUserById(userId);
-  const submissions = store.listSubmissionsByUser(userId);
+export async function getProfile(userId) {
+  const user = await store.findUserById(userId);
+  if (!user) {
+    throw new HttpError(404, "Usuario no encontrado.");
+  }
+
+  const submissions = await store.listSubmissionsByUser(userId);
 
   const acceptedProblemIds = new Set(
     submissions
@@ -92,8 +75,12 @@ export function getProfile(userId) {
   const difficultyStats = computeDifficultyStats(acceptedProblemIds);
   const totalScore = submissions.reduce((acc, submission) => acc + Number(submission.final_score || 0), 0);
   const solved = acceptedProblemIds.size;
-  const streak = calculateStreak(submissions);
-  const leaderboard = buildLeaderboard("all");
+  const streak = calculateConsecutiveDailyStreak(
+    submissions,
+    (submission) => submission.submitted_at || submission.created_at,
+    { maxLookbackDays: 60 },
+  );
+  const leaderboard = await buildLeaderboard("all");
   const rank =
     leaderboard.find((entry) => entry.username.toLowerCase() === user.username.toLowerCase())?.rank ||
     leaderboard.length + 1;
@@ -118,9 +105,9 @@ export function getProfile(userId) {
   };
 }
 
-export function getProfileSubmissions(userId) {
-  return store
-    .listSubmissionsByUser(userId)
+export async function getProfileSubmissions(userId) {
+  const submissions = await store.listSubmissionsByUser(userId);
+  return submissions
     .slice()
     .sort(
       (a, b) =>

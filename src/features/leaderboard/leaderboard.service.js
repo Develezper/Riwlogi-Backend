@@ -22,7 +22,7 @@ function timeframeMatch(dateLike, timeframe) {
   return true;
 }
 
-export function buildLeaderboard(timeframe = "all") {
+export async function buildLeaderboard(timeframe = "all") {
   const map = new Map();
 
   if (timeframe === "all") {
@@ -38,12 +38,13 @@ export function buildLeaderboard(timeframe = "all") {
   }
 
   const solvedByUser = new Map();
+  const [submissions, users] = await Promise.all([store.listSubmissions(), store.listUsers()]);
+  const usersById = new Map(users.map((user) => [user.id, user]));
 
-  store
-    .listSubmissions()
+  submissions
     .filter((submission) => timeframeMatch(submission.submitted_at || submission.created_at, timeframe))
     .forEach((submission) => {
-      const user = store.findUserById(submission.user_id);
+      const user = usersById.get(submission.user_id);
       if (!user) return;
 
       const key = user.username.toLowerCase();
@@ -83,7 +84,7 @@ export function buildLeaderboard(timeframe = "all") {
     }));
 }
 
-export function listLeaderboard({ timeframe = "all" } = {}) {
+export async function listLeaderboard({ timeframe = "all" } = {}) {
   const normalized = ["today", "week", "all"].includes(timeframe) ? timeframe : "all";
   return buildLeaderboard(normalized);
 }

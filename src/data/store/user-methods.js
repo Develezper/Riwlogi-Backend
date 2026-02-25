@@ -44,10 +44,6 @@ export const userStoreMethods = {
     return this.users.slice();
   },
 
-  getUsers() {
-    return this.listUsers();
-  },
-
   findUserById(userId) {
     return this.userById.get(toId(userId)) || null;
   },
