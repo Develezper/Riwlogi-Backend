@@ -1,5 +1,19 @@
 import { getAllProblems, getAllTags, getProblemBySlug } from "../../data/problem-catalog.js";
 import { HttpError } from "../../utils/http-error.js";
+import { z } from "zod";
+
+const listProblemsInputSchema = z.any().transform((value) => {
+  const input = value && typeof value === "object" ? value : {};
+  const parsedDifficulty = Number(input.difficulty);
+
+  return {
+    difficulty: Number.isFinite(parsedDifficulty) && parsedDifficulty > 0 ? parsedDifficulty : null,
+    search: String(input.search || "").trim().toLowerCase(),
+    tag: String(input.tag || "").trim().toLowerCase(),
+  };
+});
+
+const problemSlugSchema = z.any().transform((value) => String(value || "").trim());
 
 function toProblemSummary(problem) {
   return {
@@ -35,9 +49,12 @@ function toProblemDetail(problem) {
 }
 
 export function listProblems({ difficulty, search, tag } = {}) {
-  const parsedDifficulty = difficulty ? Number(difficulty) : null;
-  const normalizedSearch = String(search || "").trim().toLowerCase();
-  const normalizedTag = String(tag || "").trim().toLowerCase();
+  const { difficulty: parsedDifficulty, search: normalizedSearch, tag: normalizedTag } =
+    listProblemsInputSchema.parse({
+      difficulty,
+      search,
+      tag,
+    });
 
   return getAllProblems()
     .filter((problem) => {
@@ -51,7 +68,7 @@ export function listProblems({ difficulty, search, tag } = {}) {
 }
 
 export function getProblem(slug) {
-  const problem = getProblemBySlug(slug);
+  const problem = getProblemBySlug(problemSlugSchema.parse(slug));
   if (!problem) {
     throw new HttpError(404, "Problema no encontrado.");
   }

@@ -1,5 +1,9 @@
 import { nowIso } from "../../utils/time.js";
 
+const NON_ALPHANUMERIC_SEQUENCE = /[^a-z0-9]+/g;
+const EDGE_DASHES = /^-+|-+$/g;
+const SLUG_MAX_LENGTH = 60;
+
 export function toAdminUser(user, submissionsByUser) {
   const userSubmissions = submissionsByUser.get(user.id) || [];
   const accepted = new Set(
@@ -42,7 +46,7 @@ export function toAdminProblem(problem) {
 export function slugify(value) {
   return String(value || "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
+    .replace(NON_ALPHANUMERIC_SEQUENCE, "-")
+    .replace(EDGE_DASHES, "")
+    .slice(0, SLUG_MAX_LENGTH);
 }

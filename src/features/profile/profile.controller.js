@@ -1,4 +1,5 @@
 import { getProfile, getProfileSubmissions } from "./profile.service.js";
+import { paginateItems, parsePaginationQuery } from "../../utils/pagination.js";
 
 export function profileController(req, res) {
   const payload = getProfile(req.auth.userId);
@@ -6,6 +7,8 @@ export function profileController(req, res) {
 }
 
 export function profileSubmissionsController(req, res) {
-  const items = getProfileSubmissions(req.auth.userId);
-  res.json({ items });
+  const allItems = getProfileSubmissions(req.auth.userId);
+  const pagination = parsePaginationQuery(req.query);
+  const payload = paginateItems(allItems, pagination);
+  res.json(payload);
 }

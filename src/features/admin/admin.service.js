@@ -9,7 +9,8 @@ import { store } from "../../data/store.js";
 import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
 import { slugify, toAdminProblem, toAdminUser } from "./admin.formatters.js";
-import { sanitizeProblemUpdates } from "./admin.validation.js";
+import { buildAiGeneratedProblemDraft } from "./admin.problem-factory.js";
+import { normalizeGenerationPrompt, sanitizeProblemUpdates } from "./admin.validation.js";
 
 function ensureUniqueProblemId(baseId) {
   const normalizedBase = slugify(baseId) || `problem-${Date.now()}`;
@@ -137,46 +138,23 @@ export function listAdminProblems() {
 }
 
 export function generateAdminProblem({ prompt }) {
-  const cleanPrompt = String(prompt || "").trim();
-  if (cleanPrompt.length < 10) {
-    throw new HttpError(400, "El prompt debe tener al menos 10 caracteres.");
-  }
+  const cleanPrompt = normalizeGenerationPrompt(prompt);
 
   const titleSource = cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
   const title = titleSource.slice(0, 90);
   const baseId = slugify(title) || "ai-generated-problem";
   const problemId = ensureUniqueProblemId(baseId.startsWith("ai-") ? baseId : `ai-${baseId}`);
 
-  const createdProblem = createProblem({
-    id: problemId,
-    slug: problemId,
-    title,
-    difficulty: 2,
-    tags: ["ai-generated"],
-    acceptance: 0,
-    submissions: 0,
-    statement_md: `## AI Generated Problem\n\nPrompt:\n${cleanPrompt}`,
-    starter_code: {
-      python: "def solve():\n    # Write your solution here\n    pass",
-      javascript: "function solve() {\n  // Write your solution here\n}",
-      typescript: "function solve(): void {\n}",
-    },
-    stages: [
-      {
-        id: `${problemId}-stage-1`,
-        stage_index: 1,
-        prompt_md: "Implement the requested solution.",
-        visible_tests: [],
-        hidden_count: 0,
-      },
-    ],
-    stages_count: 1,
-    status: "draft",
-    source: "ai",
-    last_generated_prompt: cleanPrompt,
-    created_at: nowIso(),
-    updated_at: nowIso(),
-  });
+  const timestamp = nowIso();
+  const createdProblem = createProblem(
+    buildAiGeneratedProblemDraft({
+      problemId,
+      title,
+      prompt: cleanPrompt,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    }),
+  );
 
   return toAdminProblem(createdProblem);
 }

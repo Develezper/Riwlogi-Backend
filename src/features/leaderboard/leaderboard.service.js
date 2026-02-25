@@ -1,5 +1,9 @@
 import { store } from "../../data/store.js";
 import { LEADERBOARD_SEED } from "../../data/seeds.js";
+import { calculateConsecutiveDailyStreak } from "../../utils/streak.js";
+import { z } from "zod";
+
+const timeframeSchema = z.enum(["today", "week", "all"]).catch("all");
 
 function timeframeMatch(dateLike, timeframe) {
   if (timeframe === "all") return true;
@@ -19,34 +23,6 @@ function timeframeMatch(dateLike, timeframe) {
   }
 
   return true;
-}
-
-function toIsoDay(dateLike) {
-  const value = new Date(dateLike);
-  if (Number.isNaN(value.getTime())) return null;
-  return value.toISOString().slice(0, 10);
-}
-
-function calculateStreak(submissions) {
-  if (!Array.isArray(submissions) || submissions.length === 0) return 0;
-
-  const days = new Set(
-    submissions
-      .map((submission) => toIsoDay(submission.submitted_at || submission.created_at))
-      .filter(Boolean),
-  );
-
-  let streak = 0;
-  const cursor = new Date();
-
-  for (let index = 0; index < 365; index += 1) {
-    const day = cursor.toISOString().slice(0, 10);
-    if (!days.has(day)) break;
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak;
 }
 
 export function buildLeaderboard(timeframe = "all") {
@@ -103,7 +79,10 @@ export function buildLeaderboard(timeframe = "all") {
   submissionsByUser.forEach((entries, key) => {
     const current = map.get(key);
     if (!current) return;
-    current.streak = Math.max(current.streak, calculateStreak(entries));
+    current.streak = Math.max(
+      current.streak,
+      calculateConsecutiveDailyStreak(entries, (submission) => submission.submitted_at || submission.created_at),
+    );
   });
 
   return [...map.values()]
@@ -121,6 +100,6 @@ export function buildLeaderboard(timeframe = "all") {
 }
 
 export function listLeaderboard({ timeframe = "all" } = {}) {
-  const normalized = ["today", "week", "all"].includes(timeframe) ? timeframe : "all";
+  const normalized = timeframeSchema.parse(timeframe);
   return buildLeaderboard(normalized);
 }

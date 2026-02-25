@@ -1,6 +1,34 @@
 import { httpClient } from "../../config/http-client.js";
 import { env } from "../../config/env.js";
 import { nowIso } from "../../utils/time.js";
+import { z } from "zod";
+
+const rawSubmissionEventSchema = z.preprocess(
+  (value) => (value && typeof value === "object" ? value : {}),
+  z
+    .object({
+      type: z.any().optional(),
+      char_count: z.any().optional(),
+      timestamp: z.any().optional(),
+    })
+    .passthrough(),
+);
+
+const submissionEventSchema = rawSubmissionEventSchema.transform((event) => {
+  const charCount = Number(event?.char_count || 0);
+  const timestampValue = new Date(event?.timestamp || "");
+  const timestamp = Number.isNaN(timestampValue.getTime()) ? nowIso() : timestampValue.toISOString();
+
+  return {
+    type: String(event?.type || "unknown").trim().toLowerCase(),
+    char_count: Number.isFinite(charCount) ? Math.max(0, Math.min(charCount, 100000)) : 0,
+    timestamp,
+  };
+});
+
+function trimTrailingSlash(value) {
+  return value.endsWith("/") ? value.slice(0, -1) : value;
+}
 
 export function eventSummary(events = []) {
   return events.reduce(
@@ -43,11 +71,9 @@ export async function classifyFromEvents(events = []) {
       events,
       summary: eventSummary(events),
     };
+    const baseUrl = trimTrailingSlash(env.CLASSIFIER_API_BASE);
 
-    const { data } = await httpClient.post(
-      `${env.CLASSIFIER_API_BASE.replace(/\/$/, "")}/classify`,
-      payload,
-    );
+    const { data } = await httpClient.post(`${baseUrl}/classify`, payload);
 
     if (!data || typeof data !== "object") return fallback;
 
@@ -66,15 +92,5 @@ export async function classifyFromEvents(events = []) {
 export function sanitizeEvents(events) {
   if (!Array.isArray(events)) return [];
 
-  return events.slice(0, 200).map((event) => {
-    const charCount = Number(event?.char_count || 0);
-    const timestampValue = new Date(event?.timestamp || "");
-    const timestamp = Number.isNaN(timestampValue.getTime()) ? nowIso() : timestampValue.toISOString();
-
-    return {
-      type: String(event?.type || "unknown").trim().toLowerCase(),
-      char_count: Number.isFinite(charCount) ? Math.max(0, Math.min(charCount, 100000)) : 0,
-      timestamp,
-    };
-  });
+  return events.slice(0, 200).map((event) => submissionEventSchema.parse(event));
 }

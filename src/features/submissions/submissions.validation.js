@@ -1,45 +1,45 @@
-import { HttpError } from "../../utils/http-error.js";
+import { z } from "zod";
+import { parseOrBadRequest } from "../../utils/zod.js";
 
 export const ALLOWED_LANGUAGES = new Set(["python", "javascript", "typescript"]);
 
+function requiredTrimmedString(message) {
+  return z
+    .any()
+    .transform((value) => String(value || "").trim())
+    .refine(Boolean, { message });
+}
+
+const problemIdSchema = requiredTrimmedString("Debes indicar el problem_id.");
+const submissionIdSchema = requiredTrimmedString("Debes indicar la submission_id.");
+const stageIdSchema = requiredTrimmedString("Debes indicar el stage_id.");
+
+const languageSchema = requiredTrimmedString("Lenguaje inválido.")
+  .transform((value) => value.toLowerCase())
+  .refine((value) => ALLOWED_LANGUAGES.has(value), {
+    message: "Lenguaje inválido.",
+  });
+
+const nonEmptyCodeSchema = requiredTrimmedString("El código no puede estar vacío.");
+
 export function normalizeProblemId(problemId) {
-  const normalized = String(problemId || "").trim();
-  if (!normalized) {
-    throw new HttpError(400, "Debes indicar el problem_id.");
-  }
-  return normalized;
+  return parseOrBadRequest(problemIdSchema, problemId, "Debes indicar el problem_id.");
 }
 
 export function normalizeSubmissionId(submissionId) {
-  const normalized = String(submissionId || "").trim();
-  if (!normalized) {
-    throw new HttpError(400, "Debes indicar la submission_id.");
-  }
-  return normalized;
+  return parseOrBadRequest(submissionIdSchema, submissionId, "Debes indicar la submission_id.");
 }
 
 export function normalizeStageId(stageId) {
-  const normalized = String(stageId || "").trim();
-  if (!normalized) {
-    throw new HttpError(400, "Debes indicar el stage_id.");
-  }
-  return normalized;
+  return parseOrBadRequest(stageIdSchema, stageId, "Debes indicar el stage_id.");
 }
 
 export function normalizeLanguage(language) {
-  const normalized = String(language || "").trim().toLowerCase();
-  if (!ALLOWED_LANGUAGES.has(normalized)) {
-    throw new HttpError(400, "Lenguaje inválido.");
-  }
-  return normalized;
+  return parseOrBadRequest(languageSchema, language, "Lenguaje inválido.");
 }
 
 export function validateLanguageCode(code, language) {
-  const normalizedCode = String(code || "").trim();
-  if (!normalizedCode) {
-    throw new HttpError(400, "El código no puede estar vacío.");
-  }
-
+  const normalizedCode = parseOrBadRequest(nonEmptyCodeSchema, code, "El código no puede estar vacío.");
   const normalizedLanguage = normalizeLanguage(language);
   return {
     code: normalizedCode,

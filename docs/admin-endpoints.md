@@ -118,7 +118,8 @@ curl -X DELETE http://localhost:8000/api/admin/users/user_demo \
 **Response:**
 ```json
 {
-  "ok": true
+  "ok": true,
+  "deleted_user_id": "user_demo"
 }
 ```
 
@@ -128,9 +129,13 @@ curl -X DELETE http://localhost:8000/api/admin/users/user_demo \
 
 Lista todos los problemas con información administrativa.
 
+Query params opcionales:
+- `page` (entero > 0, default `1`)
+- `limit` (entero > 0, default `20`, máximo `100`)
+
 **Request:**
 ```bash
-curl http://localhost:8000/api/admin/problems \
+curl "http://localhost:8000/api/admin/problems?page=1&limit=20" \
   -H "Authorization: Bearer <admin_token>"
 ```
 
@@ -157,7 +162,13 @@ curl http://localhost:8000/api/admin/problems \
       "starter_code": { ... },
       "stages": [ ... ]
     }
-  ]
+  ],
+  "page": 1,
+  "limit": 20,
+  "total": 1,
+  "total_pages": 1,
+  "has_prev": false,
+  "has_next": false
 }
 ```
 
@@ -252,7 +263,8 @@ curl -X DELETE http://localhost:8000/api/admin/problems/two-sum \
 **Response:**
 ```json
 {
-  "ok": true
+  "ok": true,
+  "deleted_problem_id": "two-sum"
 }
 ```
 
@@ -263,30 +275,21 @@ curl -X DELETE http://localhost:8000/api/admin/problems/two-sum \
 ### 401 Unauthorized
 ```json
 {
-  "error": {
-    "status": 401,
-    "message": "Debes iniciar sesión para continuar."
-  }
+  "message": "Debes iniciar sesión para continuar."
 }
 ```
 
 ### 403 Forbidden
 ```json
 {
-  "error": {
-    "status": 403,
-    "message": "Acceso denegado. Se requiere rol de administrador."
-  }
+  "message": "Acceso denegado."
 }
 ```
 
 ### 404 Not Found
 ```json
 {
-  "error": {
-    "status": 404,
-    "message": "Usuario no encontrado."
-  }
+  "message": "Usuario no encontrado."
 }
 ```
 

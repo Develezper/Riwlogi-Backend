@@ -7,6 +7,7 @@ import {
     listAdminUsers,
     updateAdminProblem,
 } from "./admin.service.js";
+import { paginateItems, parsePaginationQuery } from "../../utils/pagination.js";
 
 export function getAdminOverviewController(req, res) {
     const data = getAdminOverview();
@@ -14,8 +15,10 @@ export function getAdminOverviewController(req, res) {
 }
 
 export function listAdminUsersController(req, res) {
-    const items = listAdminUsers();
-    res.json({ items });
+    const allItems = listAdminUsers();
+    const pagination = parsePaginationQuery(req.query);
+    const payload = paginateItems(allItems, pagination);
+    res.json(payload);
 }
 
 export function deleteAdminUserController(req, res) {
@@ -27,8 +30,10 @@ export function deleteAdminUserController(req, res) {
 }
 
 export function listAdminProblemsController(req, res) {
-    const items = listAdminProblems();
-    res.json({ items });
+    const allItems = listAdminProblems();
+    const pagination = parsePaginationQuery(req.query);
+    const payload = paginateItems(allItems, pagination);
+    res.json(payload);
 }
 
 export function generateAdminProblemController(req, res) {
