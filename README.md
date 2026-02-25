@@ -28,6 +28,11 @@ bun install
 bun run dev
 ```
 
+Tests:
+```bash
+bun test
+```
+
 Servidor por defecto: `http://localhost:8000`.
 
 ## Exportar seed para handoff
@@ -52,6 +57,7 @@ Bajo prefijo `/api`:
 - `GET /health`
 - `POST /auth/login`
 - `POST /auth/register`
+- `POST /auth/logout` (auth)
 - `GET /problems`
 - `GET /problems/:slug`
 - `GET /problems/tags`

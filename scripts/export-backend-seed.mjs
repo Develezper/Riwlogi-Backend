@@ -1,6 +1,8 @@
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getAllProblems, getAllTags } from "../src/data/problem-catalog.js";
+import { DEFAULT_USERS, LEADERBOARD_SEED } from "../src/data/seeds.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -179,42 +181,20 @@ async function loadProblems() {
   let problemsDir = null;
   let files = [];
 
-  for (const candidate of candidates) {
+async function detectSourcePath() {
+  for (const candidate of SOURCE_CANDIDATES) {
     try {
       const entries = await readdir(candidate, { withFileTypes: true });
-      const jsonFiles = entries
-        .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
-        .map((entry) => entry.name)
-        .sort((a, b) => a.localeCompare(b));
-
-      if (jsonFiles.length > 0) {
-        problemsDir = candidate;
-        files = jsonFiles;
-        break;
+      const hasJson = entries.some((entry) => entry.isFile() && entry.name.endsWith(".json"));
+      if (hasJson) {
+        return path.relative(ROOT_DIR, candidate) || ".";
       }
     } catch {
-      // Continue searching other candidate directories.
+      // Candidate does not exist.
     }
   }
 
-  if (!problemsDir || files.length === 0) {
-    throw new Error("No se encontraron problemas JSON para exportar seed.");
-  }
-
-  const sourcePath = path.relative(ROOT_DIR, problemsDir) || "problems";
-  loadProblems.sourcePath = sourcePath;
-
-  const problems = [];
-  for (const fileName of files) {
-    const filePath = path.join(problemsDir, fileName);
-    const raw = await readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw);
-    problems.push(normalizeProblem(parsed));
-  }
-
-  return problems.sort(
-    (a, b) => a.difficulty - b.difficulty || a.title.localeCompare(b.title) || a.id.localeCompare(b.id),
-  );
+  return "runtime-catalog";
 }
 
 async function writeJson(filePath, payload) {
@@ -222,25 +202,30 @@ async function writeJson(filePath, payload) {
 }
 
 async function main() {
-  const problems = await loadProblems();
-  const tags = [...new Set(problems.flatMap((problem) => problem.tags))].sort((a, b) =>
-    a.localeCompare(b),
-  );
+  const problems = getAllProblems();
+  if (!Array.isArray(problems) || problems.length === 0) {
+    throw new Error("No se encontraron problemas validos para exportar.");
+  }
+
+  const tags = getAllTags();
+  const usersSeed = normalizeUserSeed(DEFAULT_USERS);
+  const sourcePath = await detectSourcePath();
+  const problemsGlob = sourcePath === "runtime-catalog" ? sourcePath : `${sourcePath}/*.json`;
 
   const fullSeed = {
     generated_at: new Date().toISOString(),
     source: {
-      problems_glob: `${loadProblems.sourcePath || "problems"}/*.json`,
-      users_seed: "src/shared/services/api/local-provider.js",
-      leaderboard_seed: "src/shared/services/api/local-provider.js",
+      problems_glob: problemsGlob,
+      users_seed: "src/data/seeds.js",
+      leaderboard_seed: "src/data/seeds.js",
     },
     counts: {
       problems: problems.length,
       tags: tags.length,
-      users: USERS_SEED.length,
+      users: usersSeed.length,
       leaderboard_entries: LEADERBOARD_SEED.length,
     },
-    users_seed: USERS_SEED,
+    users_seed: usersSeed,
     leaderboard_seed: LEADERBOARD_SEED,
     tags,
     problems,
@@ -262,7 +247,7 @@ async function main() {
   await Promise.all([
     writeJson(path.join(OUTPUT_DIR, "full-seed.json"), fullSeed),
     writeJson(path.join(OUTPUT_DIR, "problems.seed.json"), { items: problems }),
-    writeJson(path.join(OUTPUT_DIR, "users.seed.json"), { items: USERS_SEED }),
+    writeJson(path.join(OUTPUT_DIR, "users.seed.json"), { items: usersSeed }),
     writeJson(path.join(OUTPUT_DIR, "leaderboard.seed.json"), { items: LEADERBOARD_SEED }),
   ]);
 

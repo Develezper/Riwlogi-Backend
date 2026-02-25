@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "bun --watch src/server.js",
     "start": "bun src/server.js",
+    "test": "bun test",
     "export:backend-seed": "bun scripts/export-backend-seed.mjs"
   },
   "dependencies": {
