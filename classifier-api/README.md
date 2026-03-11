@@ -103,6 +103,9 @@ Valores posibles de `label`:
 | `PORT` | `8001` | Puerto del servidor |
 | `CORS_ORIGINS` | `*` | Orígenes permitidos (lista separada por comas) |
 
+> Si levantas la API desde el backend Node.js (autostart), puedes controlar el host/puerto
+> con `CLASSIFIER_API_HOST` y `CLASSIFIER_API_PORT` en el `.env` del backend.
+
 ---
 
 ## Estructura del proyecto

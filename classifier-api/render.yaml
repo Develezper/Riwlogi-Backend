@@ -15,4 +15,6 @@ services:
         value: gpt-4o-mini
       - key: HOST
         value: 0.0.0.0
+      - key: CORS_ORIGINS
+        value: "*"
       # PORT lo inyecta Render automáticamente, no lo pongas tú

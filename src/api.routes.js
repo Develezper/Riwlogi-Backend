@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authRateLimiter, submissionsRateLimiter } from "./config/security.js";
 import { adminRoutes } from "./features/admin/admin.routes.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
+import { classifierRoutes } from "./features/classifier/classifier.routes.js";
 import { healthRoutes } from "./features/health/health.routes.js";
 import { leaderboardRoutes } from "./features/leaderboard/leaderboard.routes.js";
 import { problemsRoutes } from "./features/problems/problems.routes.js";
@@ -27,6 +28,7 @@ router.get("/", (_req, res) => {
 router.get("/openapi.json", openApiJsonController);
 router.use("/health", healthRoutes);
 router.use("/auth", authRateLimiter, authRoutes);
+router.use("/classifier", classifierRoutes);
 router.use("/problems", problemsRoutes);
 router.use("/admin", requireAuth, adminRoutes);
 router.use("/submissions", submissionsRateLimiter, requireAuth, submissionsRoutes);

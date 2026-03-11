@@ -9,7 +9,14 @@ import { notFound } from "./middleware/not-found.js";
 
 const app = express();
 
-const corsOrigins = env.CORS_ORIGINS;
+function normalizeOrigin(value) {
+  const normalized = String(value || "").trim();
+  if (!normalized) return "";
+  return normalized.endsWith("/") ? normalized.slice(0, -1) : normalized;
+}
+
+const corsOrigins = env.CORS_ORIGINS.map(normalizeOrigin).filter(Boolean);
+const allowAllOrigins = corsOrigins.includes("*");
 const corsOptions = {
   origin(origin, callback) {
     if (!origin) {
@@ -17,7 +24,13 @@ const corsOptions = {
       return;
     }
     
-    if (corsOrigins.includes("*") || corsOrigins.includes(origin)) {
+    if (allowAllOrigins) {
+      callback(null, true);
+      return;
+    }
+
+    const normalizedOrigin = normalizeOrigin(origin);
+    if (corsOrigins.includes(normalizedOrigin)) {
       callback(null, true);
       return;
     }
@@ -35,7 +48,7 @@ app.set("trust proxy", env.TRUST_PROXY);
 app.use(httpLogger);
 app.use(helmetMiddleware);
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => {

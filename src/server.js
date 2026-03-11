@@ -1,6 +1,7 @@
 import { app } from "./app.js";
 import { env } from "./config/env.js";
 import { logger, usingPino, usingPinoPretty } from "./config/logger.js";
+import { startClassifierApi, stopClassifierApi } from "./classifier-process.js";
 import { closeStore, initializeStore } from "./data/store.js";
 
 let httpServer = null;
@@ -8,6 +9,7 @@ let isShuttingDown = false;
 
 async function startServer() {
   await initializeStore();
+  startClassifierApi();
 
   httpServer = app.listen(env.PORT, env.HOST, () => {
     if (!usingPino) {
@@ -35,6 +37,7 @@ async function shutdown(signal) {
   isShuttingDown = true;
 
   logger.info({ signal }, "Shutting down backend");
+  await stopClassifierApi();
 
   await new Promise((resolve) => {
     if (!httpServer) {
