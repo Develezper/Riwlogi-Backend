@@ -101,6 +101,7 @@ Valores posibles de `label`:
 | `OPENAI_MODEL` | `gpt-4o-mini` | Modelo de OpenAI a usar |
 | `HOST` | `0.0.0.0` | Host del servidor |
 | `PORT` | `8001` | Puerto del servidor |
+| `CORS_ORIGINS` | `*` | Orígenes permitidos (lista separada por comas) |
 
 ---
 

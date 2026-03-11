@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 load_dotenv()
@@ -37,6 +38,21 @@ app = FastAPI(
     description="Clasifica comportamiento de programación usando OpenAI.",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+cors_origins_env = os.getenv("CORS_ORIGINS", "*")
+cors_origins = [item.strip() for item in cors_origins_env.split(",") if item.strip()]
+if not cors_origins:
+    cors_origins = ["*"]
+
+allow_all = "*" in cors_origins
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"] if allow_all else cors_origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
