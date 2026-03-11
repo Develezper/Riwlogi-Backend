@@ -1,0 +1,89 @@
+{
+  "items": [
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [
+        "Arrays",
+        "Binary Search",
+        "Dynamic Programming",
+        "Hash Table",
+        "Sorting",
+        "Stack",
+        "Strings",
+        "Trees"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    },
+    {
+      "id": "undefined",
+      "slug": "undefined",
+      "title": "",
+      "difficulty": 1,
+      "tags": [],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "",
+      "starter_code": {
+        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
+        "javascript": "function solve() {\n  // Write your solution here\n}"
+      },
+      "stages": [],
+      "stages_count": 0
+    }
+  ]
+}
