@@ -5,6 +5,7 @@ import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
 import { classifyFromEvents, sanitizeEvents } from "./submissions.events.js";
 import { evaluateStage } from "./submissions.evaluator.js";
+import { runUserCode, ensureRunnerForSubmission, stopRunnerForSubmission, touchRunner } from "./submissions.runner.js";
 import { withSubmissionLock } from "./submissions.lock.js";
 import { normalizeLanguage, normalizeProblemId, normalizeStageId, normalizeSubmissionId } from "./submissions.validation.js";
 
@@ -24,6 +25,8 @@ export async function startSubmission({ userId, problemId, language = "python" }
     problem_title: problem.title,
     language: normalizedLanguage,
   });
+
+  ensureRunnerForSubmission(submission.id, normalizedLanguage);
 
   return {
     submission_id: submission.id,
@@ -50,8 +53,17 @@ export async function runSubmission({ userId, submissionId, stageId, code, event
     }
 
     const cleanEvents = sanitizeEvents(events);
+    const shouldClassify = cleanEvents.some(
+      (event) => event.type === "run" && event.mode === "submit",
+    );
+    const execution = await runUserCode({
+      submissionId: submission.id,
+      language: submission.language,
+      code,
+    });
     const result = evaluateStage(code, stage);
-    const classification = await classifyFromEvents(cleanEvents);
+    const classification = shouldClassify ? await classifyFromEvents(cleanEvents) : null;
+    const runtimeMs = Number(execution.runtime_ms ?? result.runtime_ms ?? 0);
     const mergedStageResults = {
       ...(submission.stage_results || {}),
       [stage.id]: {
@@ -59,14 +71,14 @@ export async function runSubmission({ userId, submissionId, stageId, code, event
         stage_index: stage.stage_index,
         passed: result.passed,
         stage_score: result.stage_score,
-        runtime_ms: result.runtime_ms,
+        runtime_ms: runtimeMs,
       },
     };
     const mergedEvents = [...(submission.events || []), ...cleanEvents].slice(-env.MAX_EVENTS_PER_SUBMISSION);
 
     await store.updateSubmission(submission.id, {
       code: String(code || ""),
-      runtime_ms: result.runtime_ms,
+      runtime_ms: runtimeMs,
       stage_results: mergedStageResults,
       events: mergedEvents,
       updated_at: nowIso(),
@@ -76,9 +88,12 @@ export async function runSubmission({ userId, submissionId, stageId, code, event
       passed: result.passed,
       stage_index: stage.stage_index,
       stage_score: result.stage_score,
-      runtime_ms: result.runtime_ms,
+      runtime_ms: runtimeMs,
       visible_results: result.visible_results,
       classification,
+      stdout: execution.stdout,
+      stderr: execution.stderr,
+      timed_out: execution.timed_out,
     };
   });
 }
@@ -116,6 +131,8 @@ export async function submitSubmission({ userId, submissionId }) {
       updated_at: submittedAt,
     });
 
+    stopRunnerForSubmission(submission.id);
+
     return {
       verdict,
       final_score: finalScore,
@@ -137,6 +154,7 @@ export async function sendSubmissionEvents({ userId, submissionId, events = [] }
       events: mergedEvents,
       updated_at: nowIso(),
     });
+    touchRunner(submission.id);
     return { ok: true };
   });
 }

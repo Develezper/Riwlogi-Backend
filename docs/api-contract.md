@@ -370,6 +370,8 @@ Response `200`:
     "stage_index": 1,
     "stage_score": 88,
     "runtime_ms": 32,
+    "stdout": "True\nFalse\nTrue\nFalse\n",
+    "stderr": "",
     "visible_results": [
       {
         "input_text": "...",
