@@ -65,6 +65,15 @@ function normalizeSession(row) {
   };
 }
 
+function toJsonb(value, fallback) {
+  const resolved = value ?? fallback;
+  try {
+    return JSON.stringify(resolved);
+  } catch {
+    return JSON.stringify(fallback);
+  }
+}
+
 export class PostgresStore {
   constructor() {
     const { db, pool } = createPostgresDb();
@@ -378,11 +387,11 @@ export class PostgresStore {
         problem_title: submission.problem_title,
         language: submission.language,
         code: submission.code,
-        stage_results: submission.stage_results,
+        stage_results: toJsonb(submission.stage_results, {}),
         runtime_ms: submission.runtime_ms,
         final_score: submission.final_score,
         verdict: submission.verdict,
-        events: submission.events,
+        events: toJsonb(submission.events, []),
         created_at: submission.created_at,
         updated_at: submission.updated_at,
         submitted_at: submission.submitted_at,
@@ -451,11 +460,11 @@ export class PostgresStore {
       .updateTable("submissions")
       .set({
         code: merged.code,
-        stage_results: merged.stage_results,
+        stage_results: toJsonb(merged.stage_results, {}),
         runtime_ms: merged.runtime_ms,
         final_score: merged.final_score,
         verdict: merged.verdict,
-        events: merged.events,
+        events: toJsonb(merged.events, []),
         updated_at: merged.updated_at,
         submitted_at: merged.submitted_at,
       })

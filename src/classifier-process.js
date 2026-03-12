@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 let classifierProcess = null;
 
 function resolveClassifierDir() {
-  return path.resolve(__dirname, "../classifier-api");
+  return path.resolve(__dirname, "../../api");
 }
 
 function resolvePythonExecutable() {
