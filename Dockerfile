@@ -11,4 +11,4 @@ ENV NODE_ENV=production
 
 EXPOSE 8000
 
-CMD ["./start.sh"]
+CMD ["bun", "src/server.js"]
