@@ -35,7 +35,7 @@ app.set("trust proxy", env.TRUST_PROXY);
 app.use(httpLogger);
 app.use(helmetMiddleware);
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => {
