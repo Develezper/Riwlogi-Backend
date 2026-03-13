@@ -1,4 +1,4 @@
-import { getProblemBySlug } from "../../data/problem-catalog.js";
+import { getAllProblems } from "../../data/problem-catalog.js";
 import { store } from "../../data/store.js";
 import { HttpError } from "../../utils/http-error.js";
 import { calculateConsecutiveDailyStreak } from "../../utils/streak.js";
@@ -14,11 +14,11 @@ function toPublicUser(user) {
   };
 }
 
-function computeDifficultyStats(problemIds) {
+function computeDifficultyStats(problemIds, byId) {
   const counts = { easy: 0, medium: 0, hard: 0 };
 
   problemIds.forEach((problemId) => {
-    const problem = getProblemBySlug(problemId);
+    const problem = byId.get(String(problemId || "").toLowerCase());
     if (!problem) return;
     if (problem.difficulty === 1) counts.easy += 1;
     if (problem.difficulty === 2) counts.medium += 1;
@@ -72,7 +72,12 @@ export async function getProfile(userId) {
       .map((submission) => submission.problem_id),
   );
 
-  const difficultyStats = computeDifficultyStats(acceptedProblemIds);
+  const problems = await getAllProblems();
+  const problemsById = new Map(
+    problems.map((problem) => [String(problem.id || problem.slug || "").toLowerCase(), problem]),
+  );
+
+  const difficultyStats = computeDifficultyStats(acceptedProblemIds, problemsById);
   const totalScore = submissions.reduce((acc, submission) => acc + Number(submission.final_score || 0), 0);
   const solved = acceptedProblemIds.size;
   const streak = calculateConsecutiveDailyStreak(

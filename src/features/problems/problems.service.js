@@ -32,12 +32,13 @@ function toPublicProblem(problem) {
   };
 }
 
-export function listProblems({ difficulty, search, tag } = {}) {
+export async function listProblems({ difficulty, search, tag } = {}) {
   const parsedDifficulty = difficulty ? Number(difficulty) : null;
   const normalizedSearch = String(search || "").trim().toLowerCase();
   const normalizedTag = String(tag || "").trim().toLowerCase();
+  const problems = await getAllProblems();
 
-  return getAllProblems()
+  return problems
     .filter((problem) => {
       const difficultyMatches = !parsedDifficulty || problem.difficulty === parsedDifficulty;
       const searchMatches = !normalizedSearch || problem.title.toLowerCase().includes(normalizedSearch);
@@ -48,8 +49,8 @@ export function listProblems({ difficulty, search, tag } = {}) {
     .map(toProblemSummary);
 }
 
-export function getProblem(slug) {
-  const problem = getProblemBySlug(slug);
+export async function getProblem(slug) {
+  const problem = await getProblemBySlug(slug);
   if (!problem) {
     throw new HttpError(404, "Problema no encontrado.");
   }
@@ -57,6 +58,6 @@ export function getProblem(slug) {
   return toPublicProblem(problem);
 }
 
-export function listTags() {
-  return getAllTags();
+export async function listTags() {
+  return await getAllTags();
 }

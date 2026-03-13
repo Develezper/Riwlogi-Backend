@@ -3,12 +3,12 @@ import { resetProblemCatalog } from "../src/data/problem-catalog.js";
 import { getProblem } from "../src/features/problems/problems.service.js";
 
 beforeEach(() => {
-  resetProblemCatalog();
+  return resetProblemCatalog();
 });
 
 describe("problems public payload", () => {
-  it("does not expose private tests and returns a single stage", () => {
-    const problem = getProblem("two-sum");
+  it("does not expose private tests and returns a single stage", async () => {
+    const problem = await getProblem("two-sum");
 
     expect(problem).not.toBeNull();
     expect(Array.isArray(problem.stages)).toBe(true);

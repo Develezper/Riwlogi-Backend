@@ -20,10 +20,10 @@ describe("admin services", () => {
       prompt: "Create a graph traversal challenge for intermediate developers.",
     });
 
-    const listedAfterCreate = listAdminProblems().find((problem) => problem.id === generated.id);
+    const listedAfterCreate = (await listAdminProblems()).find((problem) => problem.id === generated.id);
     expect(listedAfterCreate).toBeDefined();
 
-    const updated = updateAdminProblem({
+    const updated = await updateAdminProblem({
       problemId: generated.id,
       updates: {
         difficulty: 3,
@@ -36,10 +36,10 @@ describe("admin services", () => {
     expect(updated.status).toBe("published");
     expect(updated.tags.includes("graphs")).toBe(true);
 
-    const deleted = deleteAdminProblem({ problemId: generated.id });
+    const deleted = await deleteAdminProblem({ problemId: generated.id });
     expect(deleted.ok).toBe(true);
 
-    const listedAfterDelete = listAdminProblems().find((problem) => problem.id === generated.id);
+    const listedAfterDelete = (await listAdminProblems()).find((problem) => problem.id === generated.id);
     expect(listedAfterDelete).toBeUndefined();
   });
 
@@ -48,7 +48,7 @@ describe("admin services", () => {
       prompt: "Create a string problem with visible tests.",
     });
 
-    const updated = updateAdminProblem({
+    const updated = await updateAdminProblem({
       problemId: generated.id,
       updates: {
         stages_json: JSON.stringify([
