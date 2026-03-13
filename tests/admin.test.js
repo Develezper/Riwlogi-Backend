@@ -48,7 +48,7 @@ describe("admin services", () => {
       prompt: "Create a string problem with visible tests.",
     });
 
-    const updated = await updateAdminProblem({
+    const updated = updateAdminProblem({
       problemId: generated.id,
       updates: {
         stages_json: JSON.stringify([

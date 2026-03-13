@@ -128,7 +128,6 @@ function trimTrailingSlash(value) {
 }
 
 async function generateProblemWithAi(prompt) {
-  if (env.NODE_ENV === "test") return null;
   if (!env.CLASSIFIER_API_BASE) return null;
 
   const baseUrl = trimTrailingSlash(env.CLASSIFIER_API_BASE);
@@ -280,12 +279,7 @@ export async function listAdminProblems() {
 
 export async function generateAdminProblem({ prompt }) {
   const cleanPrompt = normalizeGenerationPrompt(prompt);
-  const generatedPayload = (await generateProblemWithAi(cleanPrompt)) || buildFallbackGeneratedPayload(cleanPrompt);
-
-  const payloadIssue = detectGeneratedPayloadIssue(generatedPayload, cleanPrompt);
-  if (payloadIssue) {
-    throw new HttpError(502, `La IA devolvio contenido invalido: ${payloadIssue}.`);
-  }
+  const generatedPayload = await generateProblemWithAi(cleanPrompt);
 
   const generatedTitle = String(generatedPayload?.title || "").trim();
   const titleSource = generatedTitle || cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
