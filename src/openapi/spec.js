@@ -190,7 +190,7 @@ const problemSummarySchema = registry.register(
     tags: z.array(z.string()).openapi({ example: ["arrays"] }),
     acceptance: z.number().openapi({ example: 49.2 }),
     submissions: z.number().openapi({ example: 14523 }),
-    stages_count: z.number().int().min(1).openapi({ example: 3 }),
+    stages_count: z.number().int().min(1).openapi({ example: 1 }),
   }),
 );
 
@@ -600,6 +600,7 @@ const adminPatchProblemBodySchema = registry.register(
       statement_md: z.string().optional(),
       starter_code: starterCodeSchema.optional(),
       stages: z.array(adminProblemStageSchema).optional(),
+      stages_json: z.string().optional(),
       stages_count: z.number().optional(),
       status: z.string().optional(),
       source: z.string().optional(),

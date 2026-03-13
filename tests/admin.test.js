@@ -15,8 +15,8 @@ beforeEach(() => {
 });
 
 describe("admin services", () => {
-  it("persists generated problems and supports update/delete", () => {
-    const generated = generateAdminProblem({
+  it("persists generated problems and supports update/delete", async () => {
+    const generated = await generateAdminProblem({
       prompt: "Create a graph traversal challenge for intermediate developers.",
     });
 
@@ -41,6 +41,37 @@ describe("admin services", () => {
 
     const listedAfterDelete = listAdminProblems().find((problem) => problem.id === generated.id);
     expect(listedAfterDelete).toBeUndefined();
+  });
+
+  it("collapses stages_json to a single stage in admin update payload", async () => {
+    const generated = await generateAdminProblem({
+      prompt: "Create a string problem with visible tests.",
+    });
+
+    const updated = updateAdminProblem({
+      problemId: generated.id,
+      updates: {
+        stages_json: JSON.stringify([
+          {
+            stage_index: 1,
+            prompt_md: "Stage 1 prompt",
+            hidden_count: 2,
+            visible_tests: [{ input_text: "abc", expected_text: "cba" }],
+          },
+          {
+            stage_index: 2,
+            prompt_md: "Stage 2 prompt",
+            hidden_count: 3,
+            visible_tests: [{ input_text: "level", expected_text: "true" }],
+          },
+        ]),
+      },
+    });
+
+    expect(updated.stages_count).toBe(1);
+    expect(updated.stages.length).toBe(1);
+    expect(updated.stages[0].prompt_md).toBe("Stage 1 prompt");
+    expect(updated.stages[0].hidden_count).toBe(2);
   });
 
   it("prevents deleting yourself as admin", async () => {

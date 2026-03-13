@@ -10,7 +10,9 @@ import { withSubmissionLock } from "./submissions.lock.js";
 import { normalizeLanguage, normalizeProblemId, normalizeStageId, normalizeSubmissionId } from "./submissions.validation.js";
 
 function findStage(problem, stageId) {
-  return problem.stages.find((stage) => stage.id === stageId) || null;
+  const stages = Array.isArray(problem?.stages) ? problem.stages : [];
+  if (!stages.length) return null;
+  return stages.find((stage) => stage.id === stageId) || stages[0];
 }
 
 export async function startSubmission({ userId, problemId, language = "python" }) {
@@ -49,7 +51,7 @@ export async function runSubmission({ userId, submissionId, stageId, code, event
 
     const stage = findStage(problem, normalizedStageId);
     if (!stage) {
-      throw new HttpError(400, "Stage inválido.");
+      throw new HttpError(400, "Etapa inválida.");
     }
 
     const cleanEvents = sanitizeEvents(events);
@@ -110,7 +112,7 @@ export async function submitSubmission({ userId, submissionId }) {
     const stageResults = problem.stages.map((stage) => submission.stage_results[stage.id]).filter(Boolean);
 
     if (!stageResults.length) {
-      throw new HttpError(400, "Primero ejecuta al menos una etapa.");
+      throw new HttpError(400, "Primero ejecuta la etapa.");
     }
 
     const allStagesExecuted = stageResults.length === problem.stages.length;

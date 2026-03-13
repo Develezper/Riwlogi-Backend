@@ -2,31 +2,33 @@ import { nowIso } from "../../../utils/time.js";
 import { clampInt, cleanString, decodeText, normalizeStarterCode } from "./common.js";
 import { normalizeStage } from "./stage.js";
 
+function normalizeSingleStage(problemId, problemSlug, rawStages) {
+  const baseId = problemId || problemSlug || "problem";
+  const source = Array.isArray(rawStages) ? rawStages : [];
+  const firstStage = source[0] && typeof source[0] === "object" ? source[0] : {
+    id: `${baseId}-stage-1`,
+    stage_index: 1,
+    prompt_md: "Implement the requested solution.",
+    visible_tests: [],
+    hidden_count: 0,
+  };
+
+  const normalized = normalizeStage(baseId, firstStage, 0);
+
+  return [
+    {
+      ...normalized,
+      id: `${baseId}-stage-1`,
+      stage_index: 1,
+      prompt_md: normalized.prompt_md || "Implement the requested solution.",
+    },
+  ];
+}
+
 export function normalizeProblem(rawProblem, { source = "seed" } = {}) {
   const problemId = cleanString(rawProblem?.id);
   const problemSlug = cleanString(rawProblem?.slug || rawProblem?.id);
-
-  const stagesSource = Array.isArray(rawProblem?.stages) ? rawProblem.stages : [];
-  const stages = stagesSource
-    .map((stage, index) => normalizeStage(problemId || problemSlug || "problem", stage, index))
-    .sort((a, b) => a.stage_index - b.stage_index);
-
-  const normalizedStages =
-    stages.length > 0
-      ? stages
-      : [
-          normalizeStage(
-            problemId || problemSlug || "problem",
-            {
-              id: `${problemId || problemSlug || "problem"}-stage-1`,
-              stage_index: 1,
-              prompt_md: "Implement the requested solution.",
-              visible_tests: [],
-              hidden_count: 0,
-            },
-            0,
-          ),
-        ];
+  const normalizedStages = normalizeSingleStage(problemId, problemSlug, rawProblem?.stages);
 
   const tags = Array.isArray(rawProblem?.tags)
     ? [...new Set(rawProblem.tags.map((tag) => cleanString(tag)).filter(Boolean))]
@@ -52,10 +54,7 @@ export function normalizeProblem(rawProblem, { source = "seed" } = {}) {
       "No description available.",
     starter_code: starterCode,
     stages: normalizedStages,
-    stages_count: clampInt(rawProblem?.stages_count, normalizedStages.length, {
-      min: 1,
-      max: 100,
-    }),
+    stages_count: 1,
     status: cleanString(rawProblem?.status || "published").toLowerCase(),
     source: cleanString(rawProblem?.source || source).toLowerCase(),
     last_generated_prompt: decodeText(rawProblem?.last_generated_prompt || ""),

@@ -37,7 +37,7 @@ export function listAdminProblemsController(req, res) {
 }
 
 export async function generateAdminProblemController(req, res) {
-  const problem = generateAdminProblem({ prompt: req.body?.prompt });
+  const problem = await generateAdminProblem({ prompt: req.body?.prompt });
   res.status(201).json({ item: problem });
 }
 
