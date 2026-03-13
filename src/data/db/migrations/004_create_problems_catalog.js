@@ -33,24 +33,9 @@ export async function up(db) {
   await sql`ALTER TABLE problems
     ADD CONSTRAINT problems_source_check CHECK (source IN ('seed', 'handoff', 'fallback', 'base', 'custom', 'ai'))`.execute(db);
 
-  await db.schema
-    .createIndex("problems_slug_lower_unique_idx")
-    .on("problems")
-    .expression(sql`lower(slug)`)
-    .unique()
-    .execute();
-
-  await db.schema
-    .createIndex("problems_title_lower_idx")
-    .on("problems")
-    .expression(sql`lower(title)`)
-    .execute();
-
-  await db.schema
-    .createIndex("problems_difficulty_idx")
-    .on("problems")
-    .column("difficulty")
-    .execute();
+  await db.schema.createIndex("problems_slug_lower_unique_idx").on("problems").expression(sql`lower(slug)`).unique().execute();
+  await db.schema.createIndex("problems_title_lower_idx").on("problems").expression(sql`lower(title)`).execute();
+  await db.schema.createIndex("problems_difficulty_idx").on("problems").column("difficulty").execute();
 }
 
 export async function down(db) {
