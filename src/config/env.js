@@ -39,7 +39,7 @@ const envSchema = z.object({
     .catch("info"),
   LOG_PRETTY: z.preprocess((value) => asBoolean(value, true), z.boolean()).catch(true),
   TRUST_PROXY: z.preprocess((value) => asBoolean(value, false), z.boolean()).catch(false),
-  HOST: z.preprocess((value) => String(value || "").trim() || "localhost", z.string()),
+  HOST: z.preprocess((value) => String(value || "").trim() || "0.0.0.0", z.string()),
   PORT: z.coerce.number().int().min(1).max(65535).catch(8000),
   API_PREFIX: z.preprocess((value) => String(value || "").trim() || "/api", z.string()),
   CORS_ORIGINS: z.preprocess((value) => asList(value, ["*"]), z.array(z.string()).min(1)).catch(["*"]),

@@ -15,12 +15,106 @@ import { slugify, toAdminProblem, toAdminUser } from "./admin.formatters.js";
 import { buildAiGeneratedProblemDraft } from "./admin.problem-factory.js";
 import { normalizeGenerationPrompt, sanitizeProblemUpdates } from "./admin.validation.js";
 
-function ensureUniqueProblemId(baseId) {
+const TEMPLATE_MARKERS = [
+  "instrucciones internas para esta generaci",
+  "## ai generated problem",
+  "solve the problem using the function",
+  "example_input_stage_",
+  "example_output_stage_",
+  "write your solution here",
+];
+
+function normalizeComparableText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function containsTemplateMarker(value) {
+  const normalized = normalizeComparableText(value);
+  if (!normalized) return false;
+  return TEMPLATE_MARKERS.some((marker) => normalized.includes(marker));
+}
+
+function detectGeneratedPayloadIssue(payload, prompt) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return "respuesta invalida del generador";
+  }
+
+  const normalizedPrompt = normalizeComparableText(prompt);
+  const normalizedTitle = normalizeComparableText(payload.title);
+  if (normalizedPrompt && normalizedTitle && normalizedPrompt === normalizedTitle) {
+    return "titulo copia el prompt";
+  }
+
+  const statement = String(payload.statement_md || "");
+  if (statement.trim().length < 24 || containsTemplateMarker(statement)) {
+    return "enunciado de plantilla";
+  }
+
+  const stages = Array.isArray(payload.stages) ? payload.stages : [];
+  if (!stages.length) {
+    return "faltan etapas";
+  }
+
+  const visibleTests = Array.isArray(stages[0]?.visible_tests) ? stages[0].visible_tests : [];
+  if (!visibleTests.length) {
+    return "faltan tests visibles";
+  }
+
+  for (const test of visibleTests) {
+    if (containsTemplateMarker(test?.input_text) || containsTemplateMarker(test?.expected_text)) {
+      return "tests de plantilla";
+    }
+  }
+
+  return null;
+}
+
+function buildFallbackGeneratedPayload(prompt) {
+  const cleanPrompt = String(prompt || "").trim();
+  const titleBase = cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
+  const title = `${titleBase} Challenge`.slice(0, 90);
+
+  return {
+    title,
+    difficulty: 2,
+    tags: ["algorithms"],
+    statement_md: [
+      "## Description",
+      "",
+      cleanPrompt || "Solve the proposed algorithmic challenge.",
+      "",
+      "## Requirements",
+      "- Write a correct and efficient solution.",
+      "- Handle edge cases.",
+    ].join("\n"),
+    starter_code: {
+      python: "def solve(data):\n    # Write your solution here\n    pass",
+      javascript: "function solve(data) {\n  // Write your solution here\n}",
+    },
+    stages: [
+      {
+        stage_index: 1,
+        prompt_md: "Solve the complete problem in one stage.",
+        hidden_count: 1,
+        visible_tests: [
+          { input_text: "sample input", expected_text: "sample output" },
+        ],
+      },
+    ],
+  };
+}
+
+async function ensureUniqueProblemId(baseId) {
   const normalizedBase = slugify(baseId) || `problem-${Date.now()}`;
   let candidate = normalizedBase;
   let index = 2;
 
-  while (getProblemBySlug(candidate)) {
+  while (await getProblemBySlug(candidate)) {
     candidate = `${normalizedBase}-${index}`;
     index += 1;
   }
@@ -70,8 +164,11 @@ async function generateProblemWithAi(prompt) {
 }
 
 export async function getAdminOverview() {
-  const [users, submissions] = await Promise.all([store.listUsers(), store.listSubmissions()]);
-  const problems = getAllProblems();
+  const [users, submissions, problems] = await Promise.all([
+    store.listUsers(),
+    store.listSubmissions(),
+    getAllProblems(),
+  ]);
 
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const activeUsers = new Set(
@@ -175,8 +272,9 @@ export async function deleteAdminUser({ userId, requestedByUserId }) {
   };
 }
 
-export function listAdminProblems() {
-  return getAllProblems().map(toAdminProblem);
+export async function listAdminProblems() {
+  const problems = await getAllProblems();
+  return problems.map(toAdminProblem);
 }
 
 export async function generateAdminProblem({ prompt }) {
@@ -187,10 +285,10 @@ export async function generateAdminProblem({ prompt }) {
   const titleSource = generatedTitle || cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
   const title = titleSource.slice(0, 90);
   const baseId = slugify(title) || "ai-generated-problem";
-  const problemId = ensureUniqueProblemId(baseId.startsWith("ai-") ? baseId : `ai-${baseId}`);
+  const problemId = await ensureUniqueProblemId(baseId.startsWith("ai-") ? baseId : `ai-${baseId}`);
 
   const timestamp = nowIso();
-  const createdProblem = createProblem(
+  const createdProblem = await createProblem(
     buildAiGeneratedProblemDraft({
       problemId,
       title,
@@ -204,14 +302,14 @@ export async function generateAdminProblem({ prompt }) {
   return toAdminProblem(createdProblem);
 }
 
-export function updateAdminProblem({ problemId, updates }) {
+export async function updateAdminProblem({ problemId, updates }) {
   const sanitizedUpdates = sanitizeProblemUpdates(updates);
-  const updated = updateProblem(problemId, sanitizedUpdates);
+  const updated = await updateProblem(problemId, sanitizedUpdates);
   return toAdminProblem(updated);
 }
 
-export function deleteAdminProblem({ problemId }) {
-  const removed = deleteProblem(problemId);
+export async function deleteAdminProblem({ problemId }) {
+  const removed = await deleteProblem(problemId);
   return {
     ok: true,
     deleted_problem_id: removed.id,

@@ -3,7 +3,7 @@ import { resetProblemCatalog } from "../src/data/problem-catalog.js";
 import { getProblem } from "../src/features/problems/problems.service.js";
 
 beforeEach(() => {
-  resetProblemCatalog();
+  return resetProblemCatalog();
 });
 
 describe("problems public payload", () => {

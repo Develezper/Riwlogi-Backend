@@ -18,7 +18,7 @@ function findStage(problem, stageId) {
 export async function startSubmission({ userId, problemId, language = "python" }) {
   const normalizedProblemId = normalizeProblemId(problemId);
   const normalizedLanguage = language ? normalizeLanguage(language) : "python";
-  const problem = getProblemBySlug(normalizedProblemId);
+  const problem = await getProblemBySlug(normalizedProblemId);
   if (!problem) throw new HttpError(400, "Problema inválido.");
 
   const submission = await store.createSubmission({
@@ -44,7 +44,7 @@ export async function runSubmission({ userId, submissionId, stageId, code, event
       throw new HttpError(404, "No se encontró la submission activa.");
     }
 
-    const problem = getProblemBySlug(submission.problem_id);
+    const problem = await getProblemBySlug(submission.problem_id);
     if (!problem) {
       throw new HttpError(404, "No se encontró el problema de la submission.");
     }
@@ -106,7 +106,7 @@ export async function submitSubmission({ userId, submissionId }) {
     const submission = await store.findSubmissionByOwner(normalizedSubmissionId, userId);
     if (!submission) throw new HttpError(404, "Submission no encontrada.");
 
-    const problem = getProblemBySlug(submission.problem_id);
+    const problem = await getProblemBySlug(submission.problem_id);
     if (!problem) throw new HttpError(404, "Problema no encontrado.");
 
     const stageResults = problem.stages.map((stage) => submission.stage_results[stage.id]).filter(Boolean);

@@ -29,8 +29,8 @@ export async function deleteAdminUserController(req, res) {
   res.json(result);
 }
 
-export function listAdminProblemsController(req, res) {
-  const allItems = listAdminProblems();
+export async function listAdminProblemsController(req, res) {
+  const allItems = await listAdminProblems();
   const pagination = parsePaginationQuery(req.query);
   const payload = paginateItems(allItems, pagination);
   res.json(payload);
@@ -42,7 +42,7 @@ export async function generateAdminProblemController(req, res) {
 }
 
 export async function updateAdminProblemController(req, res) {
-  const problem = updateAdminProblem({
+  const problem = await updateAdminProblem({
     problemId: req.params?.id,
     updates: req.body,
   });
@@ -50,6 +50,6 @@ export async function updateAdminProblemController(req, res) {
 }
 
 export async function deleteAdminProblemController(req, res) {
-  const result = deleteAdminProblem({ problemId: req.params?.id });
+  const result = await deleteAdminProblem({ problemId: req.params?.id });
   res.json(result);
 }
