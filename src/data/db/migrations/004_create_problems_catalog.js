@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { sql } from "kysely";
 
 export async function up(db) {
@@ -44,12 +43,4 @@ export async function down(db) {
   await db.schema.dropIndex("problems_title_lower_idx").ifExists().execute();
   await db.schema.dropIndex("problems_difficulty_idx").ifExists().execute();
   await db.schema.dropTable("problems").ifExists().execute();
-=======
-export async function up() {
-  // Kept as a no-op to preserve migration history compatibility.
-}
-
-export async function down() {
-  // No schema changes to rollback.
->>>>>>> main
 }
