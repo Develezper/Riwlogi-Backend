@@ -9,6 +9,7 @@ const rawSubmissionEventSchema = z.preprocess(
     .object({
       type: z.any().optional(),
       char_count: z.any().optional(),
+      mode: z.any().optional(),
       timestamp: z.any().optional(),
     })
     .passthrough(),
@@ -22,6 +23,7 @@ const submissionEventSchema = rawSubmissionEventSchema.transform((event) => {
   return {
     type: String(event?.type || "unknown").trim().toLowerCase(),
     char_count: Number.isFinite(charCount) ? Math.max(0, Math.min(charCount, 100000)) : 0,
+    mode: event?.mode ? String(event.mode).trim().toLowerCase() : undefined,
     timestamp,
   };
 });

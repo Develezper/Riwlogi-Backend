@@ -5,6 +5,9 @@ import {
   getProblemBySlug,
   updateProblem,
 } from "../../data/problem-catalog.js";
+import { env } from "../../config/env.js";
+import { httpClient } from "../../config/http-client.js";
+import { logger } from "../../config/logger.js";
 import { store } from "../../data/store.js";
 import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
@@ -23,6 +26,47 @@ function ensureUniqueProblemId(baseId) {
   }
 
   return candidate;
+}
+
+function trimTrailingSlash(value) {
+  const text = String(value || "").trim();
+  return text.endsWith("/") ? text.slice(0, -1) : text;
+}
+
+async function generateProblemWithAi(prompt) {
+  if (!env.CLASSIFIER_API_BASE) return null;
+
+  const baseUrl = trimTrailingSlash(env.CLASSIFIER_API_BASE);
+  if (!baseUrl) return null;
+
+  try {
+    const response = await httpClient.post(
+      `${baseUrl}/generate-problem`,
+      { prompt },
+      {
+        timeout: 30_000,
+        validateStatus: () => true,
+      },
+    );
+
+    if (response.status < 200 || response.status >= 300) {
+      logger.warn(
+        { status: response.status, data: response.data },
+        "AI problem generation endpoint returned non-2xx response",
+      );
+      return null;
+    }
+
+    if (!response.data || typeof response.data !== "object" || Array.isArray(response.data)) {
+      logger.warn("AI problem generation returned invalid payload shape.");
+      return null;
+    }
+
+    return response.data;
+  } catch (error) {
+    logger.warn({ err: error }, "AI problem generation request failed.");
+    return null;
+  }
 }
 
 export async function getAdminOverview() {
@@ -135,10 +179,12 @@ export function listAdminProblems() {
   return getAllProblems().map(toAdminProblem);
 }
 
-export function generateAdminProblem({ prompt }) {
+export async function generateAdminProblem({ prompt }) {
   const cleanPrompt = normalizeGenerationPrompt(prompt);
+  const generatedPayload = await generateProblemWithAi(cleanPrompt);
 
-  const titleSource = cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
+  const generatedTitle = String(generatedPayload?.title || "").trim();
+  const titleSource = generatedTitle || cleanPrompt.split(/[.!?\n]/)[0] || "AI Generated Problem";
   const title = titleSource.slice(0, 90);
   const baseId = slugify(title) || "ai-generated-problem";
   const problemId = ensureUniqueProblemId(baseId.startsWith("ai-") ? baseId : `ai-${baseId}`);
@@ -151,6 +197,7 @@ export function generateAdminProblem({ prompt }) {
       prompt: cleanPrompt,
       createdAt: timestamp,
       updatedAt: timestamp,
+      generated: generatedPayload,
     }),
   );
 

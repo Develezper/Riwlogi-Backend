@@ -190,7 +190,7 @@ const problemSummarySchema = registry.register(
     tags: z.array(z.string()).openapi({ example: ["arrays"] }),
     acceptance: z.number().openapi({ example: 49.2 }),
     submissions: z.number().openapi({ example: 14523 }),
-    stages_count: z.number().int().min(1).openapi({ example: 3 }),
+    stages_count: z.number().int().min(1).openapi({ example: 1 }),
   }),
 );
 
@@ -286,6 +286,7 @@ const submissionEventSchema = registry.register(
   z.object({
     type: z.string().openapi({ example: "key" }),
     char_count: z.number().int().min(0).openapi({ example: 5 }),
+    mode: z.enum(["run", "submit"]).optional().openapi({ example: "run" }),
     timestamp: z.string().datetime().optional().openapi({ example: "2026-02-25T12:00:00.000Z" }),
   }),
 );
@@ -341,8 +342,11 @@ const runSubmissionResponseSchema = registry.register(
       stage_index: z.number().int().min(1),
       stage_score: z.number(),
       runtime_ms: z.number(),
+      stdout: z.string().optional(),
+      stderr: z.string().optional(),
+      timed_out: z.boolean().optional(),
       visible_results: z.array(runVisibleResultSchema),
-      classification: classificationSchema,
+      classification: classificationSchema.optional().nullable(),
     }),
   }),
 );
@@ -596,6 +600,7 @@ const adminPatchProblemBodySchema = registry.register(
       statement_md: z.string().optional(),
       starter_code: starterCodeSchema.optional(),
       stages: z.array(adminProblemStageSchema).optional(),
+      stages_json: z.string().optional(),
       stages_count: z.number().optional(),
       status: z.string().optional(),
       source: z.string().optional(),
