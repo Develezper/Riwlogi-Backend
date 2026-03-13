@@ -8,6 +8,7 @@ RUN bun install --production
 COPY . .
 
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 
 EXPOSE 8000
 
