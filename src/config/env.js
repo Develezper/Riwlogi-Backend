@@ -1,19 +1,6 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import dotenv from "dotenv";
 import { z } from "zod";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const initialEnv = { ...process.env };
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-dotenv.config({ path: path.resolve(__dirname, "../../.env.local"), override: true });
-Object.entries(initialEnv).forEach(([key, value]) => {
-  if (value !== undefined) {
-    process.env[key] = value;
-  }
-});
+// Bun loads .env and .env.local automatically (env vars take precedence over .env files)
 
 function asList(value, fallback = []) {
   const raw = String(value || "")
