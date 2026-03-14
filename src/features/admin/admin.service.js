@@ -144,11 +144,21 @@ async function generateProblemWithAi(prompt) {
     );
 
     if (response.status < 200 || response.status >= 300) {
+      const upstreamMessage =
+        response.data && typeof response.data === "object"
+          ? response.data.message || response.data.detail || response.data.error
+          : null;
+
       logger.warn(
         { status: response.status, data: response.data },
         "AI problem generation endpoint returned non-2xx response",
       );
-      return null;
+
+      throw new HttpError(
+        503,
+        "La generacion con IA no esta disponible. Revisa OPENAI_API_KEY en el servicio api.",
+        upstreamMessage ? { upstream_message: String(upstreamMessage) } : null,
+      );
     }
 
     if (!response.data || typeof response.data !== "object" || Array.isArray(response.data)) {
@@ -158,8 +168,16 @@ async function generateProblemWithAi(prompt) {
 
     return response.data;
   } catch (error) {
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
     logger.warn({ err: error }, "AI problem generation request failed.");
-    return null;
+    throw new HttpError(
+      503,
+      "No se pudo conectar con el servicio de generacion IA.",
+      error instanceof Error ? { reason: error.message } : null,
+    );
   }
 }
 
