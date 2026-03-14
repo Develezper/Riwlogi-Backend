@@ -1,17 +1,23 @@
 {
-  "generated_at": "2026-02-18T01:46:44.405Z",
+  "generated_at": "2026-03-14T22:10:56.472Z",
   "source": {
     "problems_glob": "src/data/backend-handoff/*.json",
-    "users_seed": "src/shared/services/api/local-provider.js",
-    "leaderboard_seed": "src/shared/services/api/local-provider.js"
+    "users_seed": "src/data/seeds.js"
   },
   "counts": {
-    "problems": 4,
-    "tags": 8,
-    "users": 2,
-    "leaderboard_entries": 10
+    "problems": 18,
+    "tags": 26,
+    "users": 3
   },
   "users_seed": [
+    {
+      "id": "user_admin",
+      "username": "admin",
+      "email": "admin@riwlogi.dev",
+      "password_plain": "admin123",
+      "display_name": "Administrator",
+      "created_at": "2026-01-01T10:00:00.000Z"
+    },
     {
       "id": "user_demo",
       "username": "demo",
@@ -29,259 +35,1407 @@
       "created_at": "2025-11-22T10:00:00.000Z"
     }
   ],
-  "leaderboard_seed": [
-    {
-      "username": "algorithmist",
-      "score": 4850,
-      "solved": 87,
-      "streak": 32
-    },
-    {
-      "username": "code_ninja",
-      "score": 4720,
-      "solved": 82,
-      "streak": 28
-    },
-    {
-      "username": "byte_master",
-      "score": 4580,
-      "solved": 79,
-      "streak": 21
-    },
-    {
-      "username": "devSara",
-      "score": 4320,
-      "solved": 74,
-      "streak": 18
-    },
-    {
-      "username": "logic_lord",
-      "score": 4100,
-      "solved": 71,
-      "streak": 15
-    },
-    {
-      "username": "func_wizard",
-      "score": 3920,
-      "solved": 68,
-      "streak": 14
-    },
-    {
-      "username": "recursion_queen",
-      "score": 3780,
-      "solved": 65,
-      "streak": 12
-    },
-    {
-      "username": "stack_overflow",
-      "score": 3650,
-      "solved": 62,
-      "streak": 11
-    },
-    {
-      "username": "dp_guru",
-      "score": 3500,
-      "solved": 59,
-      "streak": 9
-    },
-    {
-      "username": "hash_hero",
-      "score": 3350,
-      "solved": 56,
-      "streak": 7
-    }
-  ],
   "tags": [
-    "Arrays",
-    "Binary Search",
-    "Dynamic Programming",
-    "Hash Table",
-    "Sorting",
-    "Stack",
-    "Strings",
-    "Trees"
+    "ai-generated",
+    "algoritmos",
+    "arrays",
+    "cadena",
+    "caminos",
+    "cola",
+    "colas",
+    "contar",
+    "count",
+    "estructura de datos",
+    "estructuras de datos",
+    "fácil",
+    "hash-table",
+    "laberinto",
+    "listas",
+    "navidad",
+    "palíndromo",
+    "pila",
+    "recursión",
+    "recursividad",
+    "stack",
+    "string",
+    "strings",
+    "suma",
+    "two-pointers",
+    "vowels"
   ],
   "problems": [
     {
-      "id": "undefined",
-      "slug": "undefined",
-      "title": "",
+      "id": "ai-contador-de-elementos-en-una-pila",
+      "slug": "ai-contador-de-elementos-en-una-pila",
+      "title": "Contador de Elementos en una Pila",
       "difficulty": 1,
       "tags": [
-        "Arrays",
-        "Binary Search",
-        "Dynamic Programming",
-        "Hash Table",
-        "Sorting",
-        "Stack",
-        "Strings",
-        "Trees"
+        "pila",
+        "estructura de datos",
+        "fácil"
       ],
       "acceptance": 0,
       "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "",
+      "statement_md": "Dada una pila de números enteros, implementa una función `solve` que cuente cuántos elementos hay en la pila. La pila se representará como una lista en Python y un array en JavaScript. La función debe devolver el número total de elementos en la pila.",
       "starter_code": {
-        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
-        "javascript": "function solve() {\n  // Write your solution here\n}"
+        "python": "def solve(stack):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(stack) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
       },
-      "stages": [],
-      "stages_count": 0
+      "stages": [
+        {
+          "id": "ai-contador-de-elementos-en-una-pila-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Escribe una función que reciba una pila y retorne la cantidad de elementos que contiene. La pila se puede representar como una lista o un array. Por ejemplo, si la pila es `[1, 2, 3]`, la función debe retornar `3`.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 2, 3]",
+              "expected_text": "3",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[5, 10, 15, 20]",
+              "expected_text": "4",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 2, 3]",
+              "expected_text": "3"
+            },
+            {
+              "input_text": "[5, 10, 15, 20]",
+              "expected_text": "4"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 1 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- Reintento por duplicado (2/4): cambia enfoque, contexto y título para que sea claramente distinto.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:35:03.427Z",
+      "updated_at": "2026-03-14T00:35:03.427Z"
     },
     {
-      "id": "undefined",
-      "slug": "undefined",
-      "title": "",
+      "id": "ai-contar-elementos-en-una-pila",
+      "slug": "ai-contar-elementos-en-una-pila",
+      "title": "Contar elementos en una pila",
       "difficulty": 1,
-      "tags": [],
+      "tags": [
+        "pila",
+        "contar",
+        "fácil"
+      ],
       "acceptance": 0,
       "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "",
+      "statement_md": "Dada una pila de números enteros, debes implementar una función `solve` que cuente cuántos elementos hay en la pila. La pila se representará como una lista en Python y un array en JavaScript. La función debe devolver un entero que represente el número de elementos en la pila.",
       "starter_code": {
-        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
-        "javascript": "function solve() {\n  // Write your solution here\n}"
+        "python": "def solve(stack):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(stack) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
       },
-      "stages": [],
-      "stages_count": 0
+      "stages": [
+        {
+          "id": "ai-contar-elementos-en-una-pila-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que cuenta los elementos en la pila. La pila se pasará como un argumento a la función. Por ejemplo, si la pila es `[1, 2, 3]`, la función debe devolver `3`.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 2, 3]",
+              "expected_text": "3",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[5, 10, 15, 20]",
+              "expected_text": "4",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 2, 3]",
+              "expected_text": "3"
+            },
+            {
+              "input_text": "[5, 10, 15, 20]",
+              "expected_text": "4"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 1 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:37:01.012Z",
+      "updated_at": "2026-03-14T00:37:01.012Z"
     },
     {
-      "id": "undefined",
-      "slug": "undefined",
-      "title": "",
+      "id": "ai-contar-vocales-en-una-cadena",
+      "slug": "ai-contar-vocales-en-una-cadena",
+      "title": "Contar Vocales en una Cadena",
       "difficulty": 1,
-      "tags": [],
+      "tags": [
+        "string",
+        "count",
+        "vowels"
+      ],
       "acceptance": 0,
       "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "",
+      "statement_md": "Escribe una función `solve` que reciba una cadena de texto y devuelva el número total de vocales (a, e, i, o, u) en la cadena. Ignora las mayúsculas y considera solo las vocales en español.",
       "starter_code": {
-        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
-        "javascript": "function solve() {\n  // Write your solution here\n}"
+        "python": "def solve(s):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(s) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
       },
-      "stages": [],
-      "stages_count": 0
+      "stages": [
+        {
+          "id": "ai-contar-vocales-en-una-cadena-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Stage 1 prompt",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "abc",
+              "expected_text": "cba",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "abc",
+              "expected_text": "cba"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "Create a string problem with visible tests.",
+      "created_at": "2026-03-14T00:31:18.398Z",
+      "updated_at": "2026-03-14T00:31:18.398Z"
     },
     {
-      "id": "undefined",
-      "slug": "undefined",
-      "title": "",
+      "id": "ai-eliminar-elementos-de-la-cola",
+      "slug": "ai-eliminar-elementos-de-la-cola",
+      "title": "Eliminar Elementos de la Cola",
       "difficulty": 1,
-      "tags": [],
+      "tags": [
+        "colas",
+        "estructuras de datos",
+        "fácil"
+      ],
       "acceptance": 0,
       "submissions": 0,
       "description": "",
       "examples": [],
       "constraints": [],
-      "statement_md": "",
+      "statement_md": "Dada una cola de números enteros, debes implementar una función que elimine todos los elementos que sean menores que un valor dado. La función debe mantener el orden de los elementos restantes en la cola. La cola se representará como una lista en Python y un array en JavaScript. \n\n### Ejemplo\n\nSi la cola es `[3, 5, 2, 8, 1]` y el valor dado es `3`, la cola resultante debe ser `[3, 5, 8]`.",
       "starter_code": {
-        "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
-        "javascript": "function solve() {\n  // Write your solution here\n}"
+        "python": "def solve(queue, threshold):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(queue, threshold) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
       },
-      "stages": [],
-      "stages_count": 0
+      "stages": [
+        {
+          "id": "ai-eliminar-elementos-de-la-cola-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que recibe una cola (lista o array) y un valor umbral. La función debe eliminar todos los elementos menores que el umbral y devolver la cola resultante.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[3, 5, 2, 8, 1], 3",
+              "expected_text": "[3, 5, 8]",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[10, 20, 5, 15], 10",
+              "expected_text": "[10, 20, 15]",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[3, 5, 2, 8, 1], 3",
+              "expected_text": "[3, 5, 8]"
+            },
+            {
+              "input_text": "[10, 20, 5, 15], 10",
+              "expected_text": "[10, 20, 15]"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 4 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contador de Elementos en una Pila | Invirtiendo una Cola | Verificar Palíndromo con Pila.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:35:25.302Z",
+      "updated_at": "2026-03-14T00:35:25.302Z"
+    },
+    {
+      "id": "ai-eliminar-elementos-de-una-pila",
+      "slug": "ai-eliminar-elementos-de-una-pila",
+      "title": "Eliminar Elementos de una Pila",
+      "difficulty": 1,
+      "tags": [
+        "pila",
+        "estructura de datos",
+        "fácil"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dada una pila de enteros, debes implementar una función `solve` que elimine todos los elementos que sean menores que un valor dado `x`. La función debe retornar la nueva pila después de realizar las eliminaciones. La pila se representará como una lista en Python y un array en JavaScript.\n\n### Ejemplo\n\nSi la pila es `[5, 3, 8, 1, 4]` y `x` es `4`, la nueva pila debería ser `[5, 8, 4]`.",
+      "starter_code": {
+        "python": "def solve(stack, x):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(stack, x) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-eliminar-elementos-de-una-pila-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que elimina todos los elementos menores que `x` de la pila dada. La función debe retornar la nueva pila.\n\n### Restricciones\n- La pila puede contener hasta 100 elementos.\n- Los elementos de la pila son enteros entre -1000 y 1000.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[5, 3, 8, 1, 4], 4",
+              "expected_text": "[5, 8, 4]",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[5, 3, 8, 1, 4], 4",
+              "expected_text": "[5, 8, 4]"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 5 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contar elementos en una pila | Invertir una Cola | Verificar Palíndromo con Pila | Suma de Elementos en una Cola.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:37:25.776Z",
+      "updated_at": "2026-03-14T00:37:25.776Z"
+    },
+    {
+      "id": "ai-invertir-una-cola",
+      "slug": "ai-invertir-una-cola",
+      "title": "Invertir una Cola",
+      "difficulty": 1,
+      "tags": [
+        "cola",
+        "estructura de datos",
+        "fácil"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dada una cola, tu tarea es invertir el orden de los elementos en ella. Debes implementar una función `solve` que reciba una cola y devuelva una nueva cola con los elementos en orden invertido. Puedes asumir que la cola solo contiene números enteros.",
+      "starter_code": {
+        "python": "def solve(queue):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(queue) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-invertir-una-cola-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` para invertir una cola. La cola se representará como una lista en Python o un array en JavaScript. Asegúrate de no modificar la cola original y de devolver una nueva cola invertida.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 2, 3, 4, 5]",
+              "expected_text": "[5, 4, 3, 2, 1]",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[10, 20, 30]",
+              "expected_text": "[30, 20, 10]",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 2, 3, 4, 5]",
+              "expected_text": "[5, 4, 3, 2, 1]"
+            },
+            {
+              "input_text": "[10, 20, 30]",
+              "expected_text": "[30, 20, 10]"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 2 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contar elementos en una pila.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:37:07.433Z",
+      "updated_at": "2026-03-14T00:37:07.433Z"
+    },
+    {
+      "id": "ai-invirtiendo-una-cola",
+      "slug": "ai-invirtiendo-una-cola",
+      "title": "Invirtiendo una Cola",
+      "difficulty": 1,
+      "tags": [
+        "pila",
+        "cola",
+        "estructura de datos"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "En este ejercicio, debes implementar una función que invierta el orden de los elementos en una cola utilizando una pila. La función debe recibir una cola como entrada y devolver una nueva cola con los elementos en orden inverso. Puedes asumir que la cola solo contiene elementos de tipo entero.\n\n**Ejemplo:**\n\nSi la cola de entrada es: `1 -> 2 -> 3 -> 4`\n\nLa cola de salida debe ser: `4 -> 3 -> 2 -> 1`",
+      "starter_code": {
+        "python": "def solve(queue):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(queue) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-invirtiendo-una-cola-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que invierte el orden de los elementos en una cola utilizando una pila. La función debe recibir una cola como entrada y devolver una nueva cola con los elementos en orden inverso.\n\n**Restricciones:**\n- La cola solo contendrá enteros.\n- No puedes usar métodos de inversión de listas o similares.\n\n**Ejemplo de entrada y salida:**\n- Entrada: `queue = [1, 2, 3, 4]`\n- Salida: `[4, 3, 2, 1]`",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 2, 3, 4]",
+              "expected_text": "[4, 3, 2, 1]",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[5, 10, 15]",
+              "expected_text": "[15, 10, 5]",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 2, 3, 4]",
+              "expected_text": "[4, 3, 2, 1]"
+            },
+            {
+              "input_text": "[5, 10, 15]",
+              "expected_text": "[15, 10, 5]"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 2 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contador de Elementos en una Pila.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:35:11.237Z",
+      "updated_at": "2026-03-14T00:35:11.237Z"
+    },
+    {
+      "id": "reverse-string",
+      "slug": "reverse-string",
+      "title": "Reverse String",
+      "difficulty": 1,
+      "tags": [
+        "strings",
+        "two-pointers"
+      ],
+      "acceptance": 72,
+      "submissions": 7430,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "## Description\nWrite a function that reverses a string represented as an array of characters.",
+      "starter_code": {
+        "python": "def solve(chars):\n    # Write your solution here\n    pass",
+        "javascript": "function solve(chars) {\n  // Write your solution here\n}",
+        "typescript": "function solve(chars: string[]): void {\n}"
+      },
+      "stages": [
+        {
+          "id": "reverse-string-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Reverse the input array in-place.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "['h','e','l','l','o']",
+              "expected_text": "['o','l','l','e','h']",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "['h','e','l','l','o']",
+              "expected_text": "['o','l','l','e','h']"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "published",
+      "source": "fallback",
+      "last_generated_prompt": "",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ai-suma-de-elementos-en-una-cola",
+      "slug": "ai-suma-de-elementos-en-una-cola",
+      "title": "Suma de Elementos en una Cola",
+      "difficulty": 1,
+      "tags": [
+        "colas",
+        "suma",
+        "fácil"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dada una cola de números enteros, tu tarea es implementar una función que calcule la suma de todos los elementos en la cola. La cola se puede representar como una lista en Python o un array en JavaScript. Debes utilizar las operaciones de cola para resolver el problema.",
+      "starter_code": {
+        "python": "def solve(queue):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(queue) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-suma-de-elementos-en-una-cola-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que recibe una cola (lista de enteros) y devuelve la suma de todos sus elementos. Asegúrate de que tu solución utilice las operaciones de cola adecuadas.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 2, 3, 4, 5]",
+              "expected_text": "15",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[10, -2, 3]",
+              "expected_text": "11",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 2, 3, 4, 5]",
+              "expected_text": "15"
+            },
+            {
+              "input_text": "[10, -2, 3]",
+              "expected_text": "11"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 4 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contar elementos en una pila | Invertir una Cola | Verificar Palíndromo con Pila.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:37:19.000Z",
+      "updated_at": "2026-03-14T00:37:19.000Z"
+    },
+    {
+      "id": "ai-sumar-elementos-de-una-pila",
+      "slug": "ai-sumar-elementos-de-una-pila",
+      "title": "Sumar Elementos de una Pila",
+      "difficulty": 1,
+      "tags": [
+        "pila",
+        "suma",
+        "fácil"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dada una pila de números enteros, tu tarea es implementar una función que sume todos los elementos de la pila y devuelva el resultado. La pila se representará como una lista en Python y un array en JavaScript. **Recuerda que debes utilizar la estructura de pila (LIFO) para acceder a los elementos.**",
+      "starter_code": {
+        "python": "def solve(stack):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(stack) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-sumar-elementos-de-una-pila-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que recibe una pila (lista o array) y devuelve la suma de todos sus elementos. La pila puede estar vacía, en cuyo caso debes devolver 0.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 2, 3, 4, 5]",
+              "expected_text": "15",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[10, -2, 3]",
+              "expected_text": "11",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 2, 3, 4, 5]",
+              "expected_text": "15"
+            },
+            {
+              "input_text": "[10, -2, 3]",
+              "expected_text": "11"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 5 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contador de Elementos en una Pila | Invirtiendo una Cola | Verificar Palíndromo con Pila | Eliminar Elementos de la Cola.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:35:31.451Z",
+      "updated_at": "2026-03-14T00:35:31.451Z"
+    },
+    {
+      "id": "two-sum",
+      "slug": "two-sum",
+      "title": "Two Sum",
+      "difficulty": 1,
+      "tags": [
+        "arrays",
+        "hash-table"
+      ],
+      "acceptance": 49.2,
+      "submissions": 14523,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "## Description\nGiven an array of integers nums and an integer target, return indices of two numbers such that they add up to target.",
+      "starter_code": {
+        "python": "def solve(nums, target):\n    # Write your solution here\n    pass",
+        "javascript": "function solve(nums, target) {\n  // Write your solution here\n}",
+        "typescript": "function solve(nums: number[], target: number): number[] {\n  return [];\n}"
+      },
+      "stages": [
+        {
+          "id": "two-sum-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Solve the basic two-sum case.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[2,7,11,15], 9",
+              "expected_text": "[0,1]",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[2,7,11,15], 9",
+              "expected_text": "[0,1]"
+            }
+          ],
+          "hidden_count": 3
+        }
+      ],
+      "stages_count": 1,
+      "status": "published",
+      "source": "fallback",
+      "last_generated_prompt": "",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ai-verificar-pal-ndromo-con-pila",
+      "slug": "ai-verificar-pal-ndromo-con-pila",
+      "title": "Verificar Palíndromo con Pila",
+      "difficulty": 1,
+      "tags": [
+        "pila",
+        "palíndromo",
+        "cadena"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Escribe una función `solve` que verifique si una cadena dada es un palíndromo utilizando una pila. Un palíndromo es una palabra, frase, número o cualquier otra secuencia de caracteres que se lee igual hacia adelante y hacia atrás (ignorando espacios y mayúsculas). La función debe devolver `True` si la cadena es un palíndromo y `False` en caso contrario.\n\n### Ejemplo:\n- Entrada: \"A man a plan a canal Panama\"\n- Salida: `True`\n\n### Restricciones:\n- La cadena de entrada tendrá una longitud máxima de 100 caracteres.",
+      "starter_code": {
+        "python": "def solve(s):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(s) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-verificar-pal-ndromo-con-pila-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` para verificar si la cadena es un palíndromo utilizando una pila. Recuerda ignorar espacios y mayúsculas.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "\"A man a plan a canal Panama\"",
+              "expected_text": "True",
+              "is_hidden": false
+            },
+            {
+              "input_text": "\"Hello World\"",
+              "expected_text": "False",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "\"A man a plan a canal Panama\"",
+              "expected_text": "True"
+            },
+            {
+              "input_text": "\"Hello World\"",
+              "expected_text": "False"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 3 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contador de Elementos en una Pila | Invirtiendo una Cola.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:35:18.251Z",
+      "updated_at": "2026-03-14T00:35:18.251Z"
+    },
+    {
+      "id": "ai-verificar-pal-ndromo-con-pila-2",
+      "slug": "ai-verificar-pal-ndromo-con-pila-2",
+      "title": "Verificar Palíndromo con Pila",
+      "difficulty": 1,
+      "tags": [
+        "pila",
+        "palíndromo",
+        "cadena"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Escribe una función que verifique si una cadena dada es un palíndromo utilizando una pila. Un palíndromo es una palabra, frase, número o secuencia de caracteres que se lee igual hacia adelante y hacia atrás (ignorando espacios y mayúsculas). La función debe ignorar los espacios y considerar solo los caracteres alfanuméricos.\n\n### Ejemplo\n- **Entrada:** \"A man a plan a canal Panama\"\n- **Salida:** `True`\n\n- **Entrada:** \"Hello\"\n- **Salida:** `False`",
+      "starter_code": {
+        "python": "def solve(s):\n    # Tu código aquí\n    pass",
+        "javascript": "function solve(s) {\n    // Tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-verificar-pal-ndromo-con-pila-2-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que recibe una cadena y retorna `True` si es un palíndromo y `False` en caso contrario. Recuerda usar una pila para resolver el problema.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "\"A man a plan a canal Panama\"",
+              "expected_text": "True",
+              "is_hidden": false
+            },
+            {
+              "input_text": "\"No lemon, no melon\"",
+              "expected_text": "True",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "\"A man a plan a canal Panama\"",
+              "expected_text": "True"
+            },
+            {
+              "input_text": "\"No lemon, no melon\"",
+              "expected_text": "True"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 3 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contar elementos en una pila | Invertir una Cola.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:37:13.203Z",
+      "updated_at": "2026-03-14T00:37:13.203Z"
+    },
+    {
+      "id": "ai-creame-5-ejercios-de-pilas-y-colas-faciles-todos",
+      "slug": "ai-creame-5-ejercios-de-pilas-y-colas-faciles-todos",
+      "title": "creame 5 ejercios de pilas y colas faciles todos",
+      "difficulty": 2,
+      "tags": [
+        "ai-generated"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "## AI Generated Problem\n\nPrompt:\ncreame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 1 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "starter_code": {
+        "python": "def solve(data):\n    # Write your solution here\n    pass",
+        "javascript": "function solve(data) {\n  // Write your solution here\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-creame-5-ejercios-de-pilas-y-colas-faciles-todos-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Solve the full problem in a single stage.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "example_input_stage_1",
+              "expected_text": "example_output_stage_1",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "example_input_stage_1",
+              "expected_text": "example_output_stage_1"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 1 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T00:34:55.761Z",
+      "updated_at": "2026-03-14T00:34:55.761Z"
+    },
+    {
+      "id": "valid-parentheses",
+      "slug": "valid-parentheses",
+      "title": "Valid Parentheses",
+      "difficulty": 2,
+      "tags": [
+        "stack",
+        "strings"
+      ],
+      "acceptance": 41,
+      "submissions": 9540,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "## Description\nGiven a string containing only brackets, determine whether it is valid.",
+      "starter_code": {
+        "python": "def solve(s):\n    # Write your solution here\n    pass",
+        "javascript": "function solve(s) {\n  // Write your solution here\n}",
+        "typescript": "function solve(s: string): boolean {\n  return false;\n}"
+      },
+      "stages": [
+        {
+          "id": "valid-parentheses-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Validate small bracket strings.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "()",
+              "expected_text": "true",
+              "is_hidden": false
+            },
+            {
+              "input_text": "(]",
+              "expected_text": "false",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "()",
+              "expected_text": "true"
+            },
+            {
+              "input_text": "(]",
+              "expected_text": "false"
+            }
+          ],
+          "hidden_count": 4
+        }
+      ],
+      "stages_count": 1,
+      "status": "published",
+      "source": "fallback",
+      "last_generated_prompt": "",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ai-contar-caminos-en-un-laberinto",
+      "slug": "ai-contar-caminos-en-un-laberinto",
+      "title": "Contar Caminos en un Laberinto",
+      "difficulty": 3,
+      "tags": [
+        "recursividad",
+        "laberinto",
+        "caminos"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dado un laberinto representado como una matriz de `0`s y `1`s, donde `0` representa un camino libre y `1` representa un obstáculo, implementa una función que cuente el número de caminos posibles desde la esquina superior izquierda (0,0) hasta la esquina inferior derecha (n-1,m-1). Puedes moverte solo hacia la derecha o hacia abajo. La función debe ser recursiva y no debe utilizar estructuras de datos adicionales para almacenar caminos ya recorridos. \n\n### Ejemplo\n\nEntrada:\n```\n[[0, 0, 0],\n [0, 1, 0],\n [0, 0, 0]]\n```\nSalida:\n```\n2\n```\n### Restricciones\n- La matriz tendrá al menos 1 fila y 1 columna.\n- La matriz no excederá de 10 filas y 10 columnas.",
+      "starter_code": {
+        "python": "def solve(maze):\n    # Implementa tu solución aquí\n    pass",
+        "javascript": "function solve(maze) {\n    // Implementa tu solución aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-contar-caminos-en-un-laberinto-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` para contar los caminos en el laberinto. Asegúrate de que tu solución sea recursiva y cumpla con las restricciones mencionadas.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[[0, 0, 0], [0, 1, 0], [0, 0, 0]]",
+              "expected_text": "2",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[[0, 0], [0, 0]]",
+              "expected_text": "2",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[[0, 1], [0, 0]]",
+              "expected_text": "1",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[[0, 0, 0], [0, 1, 0], [0, 0, 0]]",
+              "expected_text": "2"
+            },
+            {
+              "input_text": "[[0, 0], [0, 0]]",
+              "expected_text": "2"
+            },
+            {
+              "input_text": "[[0, 1], [0, 0]]",
+              "expected_text": "1"
+            }
+          ],
+          "hidden_count": 3
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "Generame 2 ejercicios difíciles de recursividad",
+      "created_at": "2026-03-14T06:37:41.517Z",
+      "updated_at": "2026-03-14T06:37:41.517Z"
+    },
+    {
+      "id": "ai-el-rbol-de-navidad-perfecto",
+      "slug": "ai-el-rbol-de-navidad-perfecto",
+      "title": "El Árbol de Navidad Perfecto",
+      "difficulty": 3,
+      "tags": [
+        "navidad",
+        "recursión",
+        "algoritmos"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dada una lista de enteros que representan las alturas de diferentes ramas de un árbol de Navidad, tu tarea es encontrar la altura máxima que se puede alcanzar al combinar ramas de manera que la altura total sea un número par. Si no es posible, devuelve -1. \n\n**Ejemplo:** \n\n```python\nentrada = [3, 5, 2, 8, 1]\nresultado = 10  # Se pueden combinar 2 + 8 = 10\n``` \n\n**Restricciones:** \n- La lista puede contener hasta 1000 elementos. \n- Las alturas de las ramas son números enteros entre 1 y 1000.",
+      "starter_code": {
+        "python": "def solve(heights):\n    pass",
+        "javascript": "function solve(heights) {\n    // tu código aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-el-rbol-de-navidad-perfecto-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que toma una lista de enteros `heights` y devuelve la altura máxima que se puede alcanzar con ramas cuya suma sea par. Si no es posible, devuelve -1.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, 3, 5, 7]",
+              "expected_text": "-1",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[2, 4, 6, 8]",
+              "expected_text": "20",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[2,4,6,7,10]",
+              "expected_text": "22",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, 3, 5, 7]",
+              "expected_text": "-1"
+            },
+            {
+              "input_text": "[2, 4, 6, 8]",
+              "expected_text": "20"
+            },
+            {
+              "input_text": "[2,4,6,7,10]",
+              "expected_text": "22"
+            }
+          ],
+          "hidden_count": 3
+        }
+      ],
+      "stages_count": 1,
+      "status": "published",
+      "source": "ai",
+      "last_generated_prompt": "Crea un ejercicio navideño muy dificil",
+      "created_at": "2026-03-14T01:33:31.691Z",
+      "updated_at": "2026-03-14T01:33:31.691Z"
+    },
+    {
+      "id": "ai-sumar-n-meros-en-una-lista-anidada",
+      "slug": "ai-sumar-n-meros-en-una-lista-anidada",
+      "title": "Sumar Números en una Lista Anidada",
+      "difficulty": 3,
+      "tags": [
+        "recursividad",
+        "listas",
+        "suma"
+      ],
+      "acceptance": 0,
+      "submissions": 0,
+      "description": "",
+      "examples": [],
+      "constraints": [],
+      "statement_md": "Dada una lista que puede contener números y otras listas anidadas, implementa una función que calcule la suma de todos los números en la lista. La función debe ser recursiva y manejar correctamente los casos en que las listas están anidadas a múltiples niveles.\n\n**Ejemplo:**\n\n```python\nentrada = [1, [2, 3], [[4], 5]]\nresultado = 15  # 1 + 2 + 3 + 4 + 5 = 15\n```\n\n**Restricciones:**\n- La lista puede contener enteros y otras listas.\n- No se garantiza que la lista esté formada solo por números o listas, puede contener otros tipos de datos que deben ser ignorados.",
+      "starter_code": {
+        "python": "def solve(lista):\n    # Implementa tu solución aquí\n    pass",
+        "javascript": "function solve(lista) {\n    // Implementa tu solución aquí\n}",
+        "typescript": "function solve(): any {\n  // Write your solution here\n}"
+      },
+      "stages": [
+        {
+          "id": "ai-sumar-n-meros-en-una-lista-anidada-stage-1",
+          "stage_index": 1,
+          "prompt_md": "Implementa la función `solve` que recibe una lista y retorna la suma de todos los números en ella, considerando que puede haber listas anidadas. Usa recursión para resolver el problema.",
+          "time_limit_ms": 0,
+          "tests": [
+            {
+              "input_text": "[1, [2, 3], [[4], 5]]",
+              "expected_text": "15",
+              "is_hidden": false
+            },
+            {
+              "input_text": "[10, [20, [30]], 40]",
+              "expected_text": "100",
+              "is_hidden": false
+            }
+          ],
+          "visible_tests": [
+            {
+              "input_text": "[1, [2, 3], [[4], 5]]",
+              "expected_text": "15"
+            },
+            {
+              "input_text": "[10, [20, [30]], 40]",
+              "expected_text": "100"
+            }
+          ],
+          "hidden_count": 2
+        }
+      ],
+      "stages_count": 1,
+      "status": "draft",
+      "source": "ai",
+      "last_generated_prompt": "Generame 2 ejercicios difíciles de recursividad\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 2 de 2.\n- Dificultad objetivo: Difícil (3).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- No repitas ni variantes de estos títulos ya generados: Contar Caminos en un Laberinto.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+      "created_at": "2026-03-14T06:38:08.050Z",
+      "updated_at": "2026-03-14T06:38:08.050Z"
     }
   ],
   "api_payload_examples": {
     "problems_list": {
       "items": [
         {
-          "id": "undefined",
-          "slug": "undefined",
-          "title": "",
+          "id": "ai-contador-de-elementos-en-una-pila",
+          "slug": "ai-contador-de-elementos-en-una-pila",
+          "title": "Contador de Elementos en una Pila",
           "difficulty": 1,
           "tags": [
-            "Arrays",
-            "Binary Search",
-            "Dynamic Programming",
-            "Hash Table",
-            "Sorting",
-            "Stack",
-            "Strings",
-            "Trees"
+            "pila",
+            "estructura de datos",
+            "fácil"
           ],
           "acceptance": 0,
           "submissions": 0,
-          "stages_count": 0
+          "stages_count": 1
         },
         {
-          "id": "undefined",
-          "slug": "undefined",
-          "title": "",
+          "id": "ai-contar-elementos-en-una-pila",
+          "slug": "ai-contar-elementos-en-una-pila",
+          "title": "Contar elementos en una pila",
           "difficulty": 1,
-          "tags": [],
+          "tags": [
+            "pila",
+            "contar",
+            "fácil"
+          ],
           "acceptance": 0,
           "submissions": 0,
-          "stages_count": 0
+          "stages_count": 1
         },
         {
-          "id": "undefined",
-          "slug": "undefined",
-          "title": "",
+          "id": "ai-contar-vocales-en-una-cadena",
+          "slug": "ai-contar-vocales-en-una-cadena",
+          "title": "Contar Vocales en una Cadena",
           "difficulty": 1,
-          "tags": [],
+          "tags": [
+            "string",
+            "count",
+            "vowels"
+          ],
           "acceptance": 0,
           "submissions": 0,
-          "stages_count": 0
+          "stages_count": 1
         },
         {
-          "id": "undefined",
-          "slug": "undefined",
-          "title": "",
+          "id": "ai-eliminar-elementos-de-la-cola",
+          "slug": "ai-eliminar-elementos-de-la-cola",
+          "title": "Eliminar Elementos de la Cola",
           "difficulty": 1,
-          "tags": [],
+          "tags": [
+            "colas",
+            "estructuras de datos",
+            "fácil"
+          ],
           "acceptance": 0,
           "submissions": 0,
-          "stages_count": 0
+          "stages_count": 1
+        },
+        {
+          "id": "ai-eliminar-elementos-de-una-pila",
+          "slug": "ai-eliminar-elementos-de-una-pila",
+          "title": "Eliminar Elementos de una Pila",
+          "difficulty": 1,
+          "tags": [
+            "pila",
+            "estructura de datos",
+            "fácil"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-invertir-una-cola",
+          "slug": "ai-invertir-una-cola",
+          "title": "Invertir una Cola",
+          "difficulty": 1,
+          "tags": [
+            "cola",
+            "estructura de datos",
+            "fácil"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-invirtiendo-una-cola",
+          "slug": "ai-invirtiendo-una-cola",
+          "title": "Invirtiendo una Cola",
+          "difficulty": 1,
+          "tags": [
+            "pila",
+            "cola",
+            "estructura de datos"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "reverse-string",
+          "slug": "reverse-string",
+          "title": "Reverse String",
+          "difficulty": 1,
+          "tags": [
+            "strings",
+            "two-pointers"
+          ],
+          "acceptance": 72,
+          "submissions": 7430,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-suma-de-elementos-en-una-cola",
+          "slug": "ai-suma-de-elementos-en-una-cola",
+          "title": "Suma de Elementos en una Cola",
+          "difficulty": 1,
+          "tags": [
+            "colas",
+            "suma",
+            "fácil"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-sumar-elementos-de-una-pila",
+          "slug": "ai-sumar-elementos-de-una-pila",
+          "title": "Sumar Elementos de una Pila",
+          "difficulty": 1,
+          "tags": [
+            "pila",
+            "suma",
+            "fácil"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "two-sum",
+          "slug": "two-sum",
+          "title": "Two Sum",
+          "difficulty": 1,
+          "tags": [
+            "arrays",
+            "hash-table"
+          ],
+          "acceptance": 49.2,
+          "submissions": 14523,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-verificar-pal-ndromo-con-pila",
+          "slug": "ai-verificar-pal-ndromo-con-pila",
+          "title": "Verificar Palíndromo con Pila",
+          "difficulty": 1,
+          "tags": [
+            "pila",
+            "palíndromo",
+            "cadena"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-verificar-pal-ndromo-con-pila-2",
+          "slug": "ai-verificar-pal-ndromo-con-pila-2",
+          "title": "Verificar Palíndromo con Pila",
+          "difficulty": 1,
+          "tags": [
+            "pila",
+            "palíndromo",
+            "cadena"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-creame-5-ejercios-de-pilas-y-colas-faciles-todos",
+          "slug": "ai-creame-5-ejercios-de-pilas-y-colas-faciles-todos",
+          "title": "creame 5 ejercios de pilas y colas faciles todos",
+          "difficulty": 2,
+          "tags": [
+            "ai-generated"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "valid-parentheses",
+          "slug": "valid-parentheses",
+          "title": "Valid Parentheses",
+          "difficulty": 2,
+          "tags": [
+            "stack",
+            "strings"
+          ],
+          "acceptance": 41,
+          "submissions": 9540,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-contar-caminos-en-un-laberinto",
+          "slug": "ai-contar-caminos-en-un-laberinto",
+          "title": "Contar Caminos en un Laberinto",
+          "difficulty": 3,
+          "tags": [
+            "recursividad",
+            "laberinto",
+            "caminos"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-el-rbol-de-navidad-perfecto",
+          "slug": "ai-el-rbol-de-navidad-perfecto",
+          "title": "El Árbol de Navidad Perfecto",
+          "difficulty": 3,
+          "tags": [
+            "navidad",
+            "recursión",
+            "algoritmos"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
+        },
+        {
+          "id": "ai-sumar-n-meros-en-una-lista-anidada",
+          "slug": "ai-sumar-n-meros-en-una-lista-anidada",
+          "title": "Sumar Números en una Lista Anidada",
+          "difficulty": 3,
+          "tags": [
+            "recursividad",
+            "listas",
+            "suma"
+          ],
+          "acceptance": 0,
+          "submissions": 0,
+          "stages_count": 1
         }
       ]
     },
     "problems_tags": {
       "items": [
-        "Arrays",
-        "Binary Search",
-        "Dynamic Programming",
-        "Hash Table",
-        "Sorting",
-        "Stack",
-        "Strings",
-        "Trees"
+        "ai-generated",
+        "algoritmos",
+        "arrays",
+        "cadena",
+        "caminos",
+        "cola",
+        "colas",
+        "contar",
+        "count",
+        "estructura de datos",
+        "estructuras de datos",
+        "fácil",
+        "hash-table",
+        "laberinto",
+        "listas",
+        "navidad",
+        "palíndromo",
+        "pila",
+        "recursión",
+        "recursividad",
+        "stack",
+        "string",
+        "strings",
+        "suma",
+        "two-pointers",
+        "vowels"
       ]
     },
     "problem_by_slug": {
       "item": {
-        "id": "undefined",
-        "slug": "undefined",
-        "title": "",
+        "id": "ai-contador-de-elementos-en-una-pila",
+        "slug": "ai-contador-de-elementos-en-una-pila",
+        "title": "Contador de Elementos en una Pila",
         "difficulty": 1,
         "tags": [
-          "Arrays",
-          "Binary Search",
-          "Dynamic Programming",
-          "Hash Table",
-          "Sorting",
-          "Stack",
-          "Strings",
-          "Trees"
+          "pila",
+          "estructura de datos",
+          "fácil"
         ],
         "acceptance": 0,
         "submissions": 0,
         "description": "",
         "examples": [],
         "constraints": [],
-        "statement_md": "",
+        "statement_md": "Dada una pila de números enteros, implementa una función `solve` que cuente cuántos elementos hay en la pila. La pila se representará como una lista en Python y un array en JavaScript. La función debe devolver el número total de elementos en la pila.",
         "starter_code": {
-          "python": "class Solution:\n    def solve(self):\n        # Write your solution here\n        pass",
-          "javascript": "function solve() {\n  // Write your solution here\n}"
+          "python": "def solve(stack):\n    # Tu código aquí\n    pass",
+          "javascript": "function solve(stack) {\n    // Tu código aquí\n}",
+          "typescript": "function solve(): any {\n  // Write your solution here\n}"
         },
-        "stages": [],
-        "stages_count": 0
+        "stages": [
+          {
+            "id": "ai-contador-de-elementos-en-una-pila-stage-1",
+            "stage_index": 1,
+            "prompt_md": "Escribe una función que reciba una pila y retorne la cantidad de elementos que contiene. La pila se puede representar como una lista o un array. Por ejemplo, si la pila es `[1, 2, 3]`, la función debe retornar `3`.",
+            "time_limit_ms": 0,
+            "tests": [
+              {
+                "input_text": "[1, 2, 3]",
+                "expected_text": "3",
+                "is_hidden": false
+              },
+              {
+                "input_text": "[5, 10, 15, 20]",
+                "expected_text": "4",
+                "is_hidden": false
+              }
+            ],
+            "visible_tests": [
+              {
+                "input_text": "[1, 2, 3]",
+                "expected_text": "3"
+              },
+              {
+                "input_text": "[5, 10, 15, 20]",
+                "expected_text": "4"
+              }
+            ],
+            "hidden_count": 2
+          }
+        ],
+        "stages_count": 1,
+        "status": "draft",
+        "source": "ai",
+        "last_generated_prompt": "creame 5 ejercios de pilas y colas faciles todos\n\nInstrucciones internas para esta generación:\n- Prioridad máxima: respeta el objetivo, dominio y restricciones del prompt base del usuario.\n- Genera un solo ejercicio (no una lista).\n- Este es el ejercicio 1 de 5.\n- Dificultad objetivo: Fácil (1).\n- Debes crear exactamente una sola etapa (stage_index = 1).\n\n- Debe ser único frente al lote en título, enunciado y enfoque de solución.\n- Si el tema es el mismo, usa una mecánica distinta (objetivo, restricciones o estructura de datos).\n- Reintento por duplicado (2/4): cambia enfoque, contexto y título para que sea claramente distinto.\n- La única etapa debe incluir: stage_index, prompt_md, hidden_count y visible_tests.",
+        "created_at": "2026-03-14T00:35:03.427Z",
+        "updated_at": "2026-03-14T00:35:03.427Z"
       }
     }
   }

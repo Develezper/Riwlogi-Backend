@@ -1,6 +1,14 @@
 {
   "items": [
     {
+      "id": "user_admin",
+      "username": "admin",
+      "email": "admin@riwlogi.dev",
+      "password_plain": "admin123",
+      "display_name": "Administrator",
+      "created_at": "2026-01-01T10:00:00.000Z"
+    },
+    {
       "id": "user_demo",
       "username": "demo",
       "email": "demo@riwlogi.dev",

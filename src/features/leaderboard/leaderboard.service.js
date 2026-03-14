@@ -1,6 +1,5 @@
 import { store } from "../../data/store.js";
-import { LEADERBOARD_SEED } from "../../data/seeds.js";
-import { hashString } from "../../utils/hash.js";
+import { calculateConsecutiveDailyStreak } from "../../utils/streak.js";
 
 function timeframeMatch(dateLike, timeframe) {
   if (timeframe === "all") return true;
@@ -24,51 +23,56 @@ function timeframeMatch(dateLike, timeframe) {
 
 export async function buildLeaderboard(timeframe = "all") {
   const map = new Map();
-
-  if (timeframe === "all") {
-    LEADERBOARD_SEED.forEach((entry) => {
-      map.set(entry.username.toLowerCase(), {
-        username: entry.username,
-        avatar: entry.username[0].toUpperCase(),
-        score: entry.score,
-        solved: entry.solved,
-        streak: entry.streak,
-      });
-    });
-  }
+  const submissionsByUser = new Map();
 
   const solvedByUser = new Map();
   const [submissions, users] = await Promise.all([store.listSubmissions(), store.listUsers()]);
   const usersById = new Map(users.map((user) => [user.id, user]));
 
   submissions
-    .filter((submission) => timeframeMatch(submission.submitted_at || submission.created_at, timeframe))
+    .filter((submission) =>
+      timeframeMatch(
+        submission.submitted_at || submission.created_at,
+        timeframe,
+      ),
+    )
     .forEach((submission) => {
       const user = usersById.get(submission.user_id);
       if (!user) return;
 
       const key = user.username.toLowerCase();
-      const current =
-        map.get(key) ||
-        {
-          username: user.username,
-          avatar: user.username[0].toUpperCase(),
-          score: 0,
-          solved: 0,
-          streak: 0,
-        };
+      const current = map.get(key) || {
+        username: user.username,
+        avatar: user.username[0].toUpperCase(),
+        score: 0,
+        solved: 0,
+        streak: 0,
+      };
 
       current.score += Number(submission.final_score || 0);
 
       if (!solvedByUser.has(key)) solvedByUser.set(key, new Set());
       if (submission.verdict === "accepted") {
         solvedByUser.get(key).add(submission.problem_id);
+        if (!submissionsByUser.has(key)) submissionsByUser.set(key, []);
+        submissionsByUser.get(key).push(submission);
       }
 
       current.solved = Math.max(current.solved, solvedByUser.get(key).size);
-      current.streak = Math.max(current.streak, 1 + (hashString(key) % 14));
       map.set(key, current);
     });
+
+  submissionsByUser.forEach((userSubmissions, key) => {
+    const current = map.get(key);
+    if (!current) return;
+
+    current.streak = calculateConsecutiveDailyStreak(
+      userSubmissions,
+      (submission) => submission.submitted_at || submission.created_at,
+    );
+
+    map.set(key, current);
+  });
 
   return [...map.values()]
     .sort((a, b) => b.score - a.score || b.solved - a.solved || a.username.localeCompare(b.username))
