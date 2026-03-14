@@ -46,7 +46,7 @@ const corsOptions = {
 
 app.disable("x-powered-by");
 app.set("trust proxy", env.TRUST_PROXY);
-app.use(httpLogger);
+//app.use(httpLogger);
 app.use(helmetMiddleware);
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
