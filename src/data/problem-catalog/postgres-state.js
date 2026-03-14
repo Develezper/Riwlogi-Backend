@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { env } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 import { createPostgresDb } from "../db/client.js";
 import { runMigrations } from "../db/migrator.js";
@@ -6,6 +7,22 @@ import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
 import { loadCatalog, sortProblems } from "./loaders.js";
 import { cleanString, isValidProblem, normalizeProblem } from "./normalizers.js";
+
+const CONNECT_MAX_RETRIES = env.DB_CONNECT_MAX_RETRIES;
+const CONNECT_DELAY_MS = env.DB_CONNECT_RETRY_DELAY_MS;
+const CONNECT_MAX_DELAY_MS = env.DB_CONNECT_RETRY_MAX_DELAY_MS;
+const CONNECT_BACKOFF = env.DB_CONNECT_RETRY_BACKOFF;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function calculateRetryDelay(attempt) {
+  const computed = Math.round(
+    CONNECT_DELAY_MS * CONNECT_BACKOFF ** Math.max(0, attempt - 1),
+  );
+  return Math.min(CONNECT_MAX_DELAY_MS, Math.max(CONNECT_DELAY_MS, computed));
+}
 
 function asIso(value) {
   const parsed = new Date(value);
@@ -94,15 +111,66 @@ class PostgresProblemCatalog {
 
   async ensureReady() {
     if (!this.readyPromise) {
-      this.readyPromise = this.initialize();
+      this.readyPromise = this.initializeWithRetry();
     }
 
-    await this.readyPromise;
+    try {
+      await this.readyPromise;
+    } catch (error) {
+      this.readyPromise = null;
+      throw error;
+    }
   }
 
   async initialize() {
     await runMigrations(this.db, logger);
     await this.seedIfNeeded();
+  }
+
+  async initializeWithRetry() {
+    let attempt = 0;
+
+    while (attempt <= CONNECT_MAX_RETRIES) {
+      attempt += 1;
+
+      try {
+        await this.initialize();
+
+        if (attempt > 1) {
+          logger.info(
+            {
+              component: "problem_catalog",
+              attempt,
+            },
+            "Postgres catalog connection recovered",
+          );
+        }
+
+        return;
+      } catch (error) {
+        const retriesUsed = attempt - 1;
+        const retriesRemaining = Math.max(0, CONNECT_MAX_RETRIES - retriesUsed);
+        const canRetry = retriesRemaining > 0;
+
+        logger.warn(
+          {
+            err: error,
+            component: "problem_catalog",
+            attempt,
+            retries_remaining: retriesRemaining,
+          },
+          canRetry
+            ? "Postgres catalog init failed, retrying"
+            : "Postgres catalog init failed, retries exhausted",
+        );
+
+        if (!canRetry) {
+          throw error;
+        }
+
+        await sleep(calculateRetryDelay(attempt));
+      }
+    }
   }
 
   async seedIfNeeded() {
@@ -162,8 +230,8 @@ class PostgresProblemCatalog {
 
   async getAllTags() {
     const problems = await this.getAllProblems();
-    return [...new Set(problems.flatMap((problem) => problem.tags || []))].sort((a, b) =>
-      String(a).localeCompare(String(b)),
+    return [...new Set(problems.flatMap((problem) => problem.tags || []))].sort(
+      (a, b) => String(a).localeCompare(String(b)),
     );
   }
 
@@ -181,7 +249,9 @@ class PostgresProblemCatalog {
     const collision = await this.db
       .selectFrom("problems")
       .select("id")
-      .where(sql`lower(id) = ${toNeedle(problem.id)} OR lower(slug) = ${toNeedle(problem.slug)}`)
+      .where(
+        sql`lower(id) = ${toNeedle(problem.id)} OR lower(slug) = ${toNeedle(problem.slug)}`,
+      )
       .executeTakeFirst();
 
     if (collision) {

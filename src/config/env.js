@@ -82,6 +82,32 @@ const envSchema = z.object({
     (value) => String(value || "").trim() || "python",
     z.string(),
   ),
+  CLASSIFIER_API_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .min(500)
+    .max(120_000)
+    .catch(12_000),
+  CLASSIFIER_API_MAX_RETRIES: z.coerce.number().int().min(0).max(20).catch(6),
+  CLASSIFIER_API_RETRY_DELAY_MS: z.coerce
+    .number()
+    .int()
+    .min(100)
+    .max(60_000)
+    .catch(1_200),
+  CLASSIFIER_API_RETRY_MAX_DELAY_MS: z.coerce
+    .number()
+    .int()
+    .min(100)
+    .max(120_000)
+    .catch(10_000),
+  CLASSIFIER_API_RETRY_BACKOFF: z.coerce.number().min(1).max(10).catch(1.7),
+  CLASSIFIER_API_RETRY_MAX_ELAPSED_MS: z.coerce
+    .number()
+    .int()
+    .min(1_000)
+    .max(600_000)
+    .catch(90_000),
   SESSION_TTL_HOURS: z.coerce
     .number()
     .int()
@@ -149,6 +175,20 @@ const envSchema = z.object({
       z.enum(["disable", "require"]),
     )
     .catch("require"),
+  DB_CONNECT_MAX_RETRIES: z.coerce.number().int().min(0).max(1000).catch(30),
+  DB_CONNECT_RETRY_DELAY_MS: z.coerce
+    .number()
+    .int()
+    .min(100)
+    .max(60_000)
+    .catch(2_000),
+  DB_CONNECT_RETRY_MAX_DELAY_MS: z.coerce
+    .number()
+    .int()
+    .min(100)
+    .max(300_000)
+    .catch(10_000),
+  DB_CONNECT_RETRY_BACKOFF: z.coerce.number().min(1).max(10).catch(1.5),
 });
 
 const resolved = envSchema.parse(process.env);

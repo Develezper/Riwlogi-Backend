@@ -10,6 +10,21 @@ import { DEFAULT_USERS } from "../seeds.js";
 import { normalizeUser, toId, toLookupKey } from "./utils.js";
 
 const SESSION_TTL_MS = env.SESSION_TTL_HOURS * 60 * 60 * 1000;
+const CONNECT_MAX_RETRIES = env.DB_CONNECT_MAX_RETRIES;
+const CONNECT_DELAY_MS = env.DB_CONNECT_RETRY_DELAY_MS;
+const CONNECT_MAX_DELAY_MS = env.DB_CONNECT_RETRY_MAX_DELAY_MS;
+const CONNECT_BACKOFF = env.DB_CONNECT_RETRY_BACKOFF;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function calculateRetryDelay(attempt) {
+  const computed = Math.round(
+    CONNECT_DELAY_MS * CONNECT_BACKOFF ** Math.max(0, attempt - 1),
+  );
+  return Math.min(CONNECT_MAX_DELAY_MS, Math.max(CONNECT_DELAY_MS, computed));
+}
 
 function asIso(value) {
   const parsed = new Date(value);
@@ -85,14 +100,66 @@ export class PostgresStore {
 
   async bootstrap() {
     if (!this.readyPromise) {
-      this.readyPromise = this.initialize();
+      this.readyPromise = this.initializeWithRetry();
     }
-    await this.readyPromise;
+
+    try {
+      await this.readyPromise;
+    } catch (error) {
+      this.readyPromise = null;
+      throw error;
+    }
   }
 
   async initialize() {
     await runMigrations(this.db, logger);
     await this.seedUsersIfNeeded();
+  }
+
+  async initializeWithRetry() {
+    let attempt = 0;
+
+    while (attempt <= CONNECT_MAX_RETRIES) {
+      attempt += 1;
+
+      try {
+        await this.initialize();
+
+        if (attempt > 1) {
+          logger.info(
+            {
+              provider: this.provider,
+              attempt,
+            },
+            "Postgres connection recovered",
+          );
+        }
+
+        return;
+      } catch (error) {
+        const retriesUsed = attempt - 1;
+        const retriesRemaining = Math.max(0, CONNECT_MAX_RETRIES - retriesUsed);
+        const canRetry = retriesRemaining > 0;
+
+        logger.warn(
+          {
+            err: error,
+            provider: this.provider,
+            attempt,
+            retries_remaining: retriesRemaining,
+          },
+          canRetry
+            ? "Postgres init failed, retrying"
+            : "Postgres init failed, retries exhausted",
+        );
+
+        if (!canRetry) {
+          throw error;
+        }
+
+        await sleep(calculateRetryDelay(attempt));
+      }
+    }
   }
 
   async healthCheck() {
@@ -154,7 +221,11 @@ export class PostgresStore {
 
   async listUsers() {
     await this.bootstrap();
-    const rows = await this.db.selectFrom("users").selectAll().orderBy("created_at", "asc").execute();
+    const rows = await this.db
+      .selectFrom("users")
+      .selectAll()
+      .orderBy("created_at", "asc")
+      .execute();
     return rows.map((row) => normalizeUserRow(row));
   }
 
@@ -163,7 +234,11 @@ export class PostgresStore {
     const normalized = toId(userId);
     if (!normalized) return null;
 
-    const row = await this.db.selectFrom("users").selectAll().where("id", "=", normalized).executeTakeFirst();
+    const row = await this.db
+      .selectFrom("users")
+      .selectAll()
+      .where("id", "=", normalized)
+      .executeTakeFirst();
     return row ? normalizeUserRow(row) : null;
   }
 
@@ -175,7 +250,9 @@ export class PostgresStore {
     const row = await this.db
       .selectFrom("users")
       .selectAll()
-      .where(sql`lower(email) = ${normalized} OR lower(username) = ${normalized}`)
+      .where(
+        sql`lower(email) = ${normalized} OR lower(username) = ${normalized}`,
+      )
       .executeTakeFirst();
 
     return row ? normalizeUserRow(row) : null;
@@ -477,7 +554,11 @@ export class PostgresStore {
 
   async listSubmissions() {
     await this.bootstrap();
-    const rows = await this.db.selectFrom("submissions").selectAll().orderBy("created_at", "asc").execute();
+    const rows = await this.db
+      .selectFrom("submissions")
+      .selectAll()
+      .orderBy("created_at", "asc")
+      .execute();
     return rows.map((row) => normalizeSubmission(row));
   }
 

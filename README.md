@@ -84,3 +84,14 @@ Bajo prefijo `/api`:
   - Por defecto permite cualquier origen (`CORS_ORIGINS=*`).
   - Puedes restringirlo con una lista separada por comas:
     - `CORS_ORIGINS=http://localhost:5173,https://tu-dominio.com`
+
+## Resiliencia para servicios en cold start (Render)
+- API de IA (`CLASSIFIER_API_BASE`):
+  - `CLASSIFIER_API_TIMEOUT_MS=12000`
+  - `CLASSIFIER_API_MAX_RETRIES=6`
+  - `CLASSIFIER_API_RETRY_DELAY_MS=1200`
+  - `CLASSIFIER_API_RETRY_MAX_DELAY_MS=10000`
+  - `CLASSIFIER_API_RETRY_BACKOFF=1.7`
+  - `CLASSIFIER_API_RETRY_MAX_ELAPSED_MS=90000`
+
+Si el servicio tarda ~1 minuto en "despertar", aumenta `CLASSIFIER_API_MAX_RETRIES` y/o `CLASSIFIER_API_RETRY_MAX_ELAPSED_MS`.

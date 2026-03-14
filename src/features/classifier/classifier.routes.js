@@ -1,13 +1,12 @@
 import { Router } from "express";
 import { env } from "../../config/env.js";
-import { httpClient } from "../../config/http-client.js";
 import { logger } from "../../config/logger.js";
+import {
+  requestClassifierApi,
+  trimTrailingSlash,
+} from "./classifier-client.js";
 
 const router = Router();
-
-function trimTrailingSlash(value) {
-  return value.endsWith("/") ? value.slice(0, -1) : value;
-}
 
 function buildTargetUrl(baseUrl, pathWithQuery) {
   const trimmedBase = trimTrailingSlash(baseUrl);
@@ -32,12 +31,13 @@ async function proxyHandler(req, res) {
   const targetUrl = buildTargetUrl(env.CLASSIFIER_API_BASE, req.url);
 
   try {
-    const response = await httpClient.request({
+    const response = await requestClassifierApi({
+      operationName: "classifier_proxy",
       method: req.method,
       url: targetUrl,
       data: req.body,
       headers: pickForwardHeaders(req.headers),
-      timeout: 15_000,
+      timeout: env.CLASSIFIER_API_TIMEOUT_MS,
       validateStatus: () => true,
     });
 
