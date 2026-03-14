@@ -1,5 +1,8 @@
-import { httpClient } from "../../config/http-client.js";
 import { env } from "../../config/env.js";
+import {
+  requestClassifierApi,
+  trimTrailingSlash,
+} from "../classifier/classifier-client.js";
 import { nowIso } from "../../utils/time.js";
 import { z } from "zod";
 
@@ -18,19 +21,21 @@ const rawSubmissionEventSchema = z.preprocess(
 const submissionEventSchema = rawSubmissionEventSchema.transform((event) => {
   const charCount = Number(event?.char_count || 0);
   const timestampValue = new Date(event?.timestamp || "");
-  const timestamp = Number.isNaN(timestampValue.getTime()) ? nowIso() : timestampValue.toISOString();
+  const timestamp = Number.isNaN(timestampValue.getTime())
+    ? nowIso()
+    : timestampValue.toISOString();
 
   return {
-    type: String(event?.type || "unknown").trim().toLowerCase(),
-    char_count: Number.isFinite(charCount) ? Math.max(0, Math.min(charCount, 100000)) : 0,
+    type: String(event?.type || "unknown")
+      .trim()
+      .toLowerCase(),
+    char_count: Number.isFinite(charCount)
+      ? Math.max(0, Math.min(charCount, 100000))
+      : 0,
     mode: event?.mode ? String(event.mode).trim().toLowerCase() : undefined,
     timestamp,
   };
 });
-
-function trimTrailingSlash(value) {
-  return value.endsWith("/") ? value.slice(0, -1) : value;
-}
 
 export function eventSummary(events = []) {
   return events.reduce(
@@ -75,16 +80,30 @@ export async function classifyFromEvents(events = []) {
     };
     const baseUrl = trimTrailingSlash(env.CLASSIFIER_API_BASE);
 
-    const { data } = await httpClient.post(`${baseUrl}/classify`, payload);
+    const response = await requestClassifierApi({
+      operationName: "classify_submission_events",
+      method: "POST",
+      url: `${baseUrl}/classify`,
+      data: payload,
+      timeout: env.CLASSIFIER_API_TIMEOUT_MS,
+      validateStatus: () => true,
+    });
+
+    const { data } = response;
 
     if (!data || typeof data !== "object") return fallback;
 
-    const label = typeof data.label === "string" && data.label.trim() ? data.label : fallback.label;
+    const label =
+      typeof data.label === "string" && data.label.trim()
+        ? data.label
+        : fallback.label;
     const confidence = Number(data.confidence);
 
     return {
       label,
-      confidence: Number.isFinite(confidence) ? confidence : fallback.confidence,
+      confidence: Number.isFinite(confidence)
+        ? confidence
+        : fallback.confidence,
     };
   } catch {
     return fallback;
@@ -94,5 +113,7 @@ export async function classifyFromEvents(events = []) {
 export function sanitizeEvents(events) {
   if (!Array.isArray(events)) return [];
 
-  return events.slice(0, 200).map((event) => submissionEventSchema.parse(event));
+  return events
+    .slice(0, 200)
+    .map((event) => submissionEventSchema.parse(event));
 }

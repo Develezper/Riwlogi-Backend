@@ -6,11 +6,14 @@ import {
   updateProblem,
 } from "../../data/problem-catalog.js";
 import { env } from "../../config/env.js";
-import { httpClient } from "../../config/http-client.js";
 import { logger } from "../../config/logger.js";
 import { store } from "../../data/store.js";
 import { HttpError } from "../../utils/http-error.js";
 import { nowIso } from "../../utils/time.js";
+import {
+  requestClassifierApi,
+  trimTrailingSlash,
+} from "../classifier/classifier-client.js";
 import { slugify, toAdminProblem, toAdminUser } from "./admin.formatters.js";
 import { buildAiGeneratedProblemDraft } from "./admin.problem-factory.js";
 import { normalizeGenerationPrompt, sanitizeProblemUpdates } from "./admin.validation.js";
@@ -122,11 +125,6 @@ async function ensureUniqueProblemId(baseId) {
   return candidate;
 }
 
-function trimTrailingSlash(value) {
-  const text = String(value || "").trim();
-  return text.endsWith("/") ? text.slice(0, -1) : text;
-}
-
 async function generateProblemWithAi(prompt) {
   if (!env.CLASSIFIER_API_BASE) return null;
 
@@ -134,14 +132,14 @@ async function generateProblemWithAi(prompt) {
   if (!baseUrl) return null;
 
   try {
-    const response = await httpClient.post(
-      `${baseUrl}/generate-problem`,
-      { prompt },
-      {
-        timeout: 30_000,
-        validateStatus: () => true,
-      },
-    );
+    const response = await requestClassifierApi({
+      operationName: "generate_admin_problem",
+      method: "POST",
+      url: `${baseUrl}/generate-problem`,
+      data: { prompt },
+      timeout: Math.max(30_000, env.CLASSIFIER_API_TIMEOUT_MS),
+      validateStatus: () => true,
+    });
 
     if (response.status < 200 || response.status >= 300) {
       const upstreamMessage =

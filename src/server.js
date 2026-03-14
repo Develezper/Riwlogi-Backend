@@ -8,9 +8,6 @@ let httpServer = null;
 let isShuttingDown = false;
 
 async function startServer() {
-  await initializeStore();
-  startClassifierApi();
-
   httpServer = app.listen(env.PORT, env.HOST, () => {
     if (!usingPino) {
       logger.warn(
@@ -30,6 +27,17 @@ async function startServer() {
       "Riwlogi backend started",
     );
   });
+
+  startClassifierApi();
+
+  if (env.STORE_PROVIDER === "postgres") {
+    initializeStore().catch((error) => {
+      logger.warn(
+        { err: error, store_provider: env.STORE_PROVIDER },
+        "Initial store warm-up failed; backend stays up and will retry on demand",
+      );
+    });
+  }
 }
 
 async function shutdown(signal) {

@@ -4,6 +4,7 @@ import { apiRoutes } from "./api.routes.js";
 import { env } from "./config/env.js";
 import { httpLogger } from "./config/logger.js";
 import { helmetMiddleware } from "./config/security.js";
+import { classifierHealthPing } from "./middleware/classifier-health-ping.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { notFound } from "./middleware/not-found.js";
 
@@ -50,6 +51,7 @@ app.use(helmetMiddleware);
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
+app.use(classifierHealthPing);
 
 app.get("/", (_req, res) => {
 	res.json({
