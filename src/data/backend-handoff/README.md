@@ -14,13 +14,11 @@ bun run export:backend-seed
   - problemas normalizados
   - tags
   - usuarios demo seed
-  - leaderboard seed
   - ejemplos de payload API
 - `src/data/backend-handoff/problems.seed.json`: solo problemas.
 - `src/data/backend-handoff/users.seed.json`: usuarios demo seed.
-- `src/data/backend-handoff/leaderboard.seed.json`: leaderboard seed.
 
 ## Fuente de datos
 
 - Problemas: `problems/*.json`
-- Seeds de usuario/leaderboard: `src/shared/services/api/local-provider.js`
+- Seed de usuarios: `src/shared/services/api/local-provider.js`
