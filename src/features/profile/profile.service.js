@@ -2,7 +2,6 @@ import { getAllProblems } from "../../data/problem-catalog.js";
 import { store } from "../../data/store.js";
 import { HttpError } from "../../utils/http-error.js";
 import { calculateConsecutiveDailyStreak } from "../../utils/streak.js";
-import { buildLeaderboard } from "../leaderboard/leaderboard.service.js";
 
 function toPublicUser(user) {
   return {
@@ -31,17 +30,85 @@ function computeDifficultyStats(problemIds, byId) {
 function buildBadges({ solved, hardSolved, streak, totalScore }) {
   const badges = [];
 
-  if (solved >= 1) badges.push({ name: "First Solve", description: "Resolved your first challenge", icon: "check-circle" });
-  if (solved >= 5) badges.push({ name: "Consistency", description: "Solved 5+ different problems", icon: "award" });
-  if (hardSolved >= 3) badges.push({ name: "Hard Crusher", description: "Solved 3 hard challenges", icon: "trophy" });
-  if (streak >= 7) badges.push({ name: "Streak Master", description: "Maintained a 7-day streak", icon: "flame" });
-  if (totalScore >= 1000) badges.push({ name: "Speed Demon", description: "Reached 1000+ total points", icon: "zap" });
+  if (solved >= 1)
+    badges.push({
+      name: "Primer ejercicio resuelto",
+      description: "Completaste tu primer reto.",
+      icon: "check-circle",
+    });
+  if (solved >= 5)
+    badges.push({
+      name: "Constancia",
+      description: "Resolviste 5 o mas ejercicios distintos.",
+      icon: "award",
+    });
+  if (hardSolved >= 3)
+    badges.push({
+      name: "Dominio avanzado",
+      description: "Resolviste 3 ejercicios dificiles.",
+      icon: "trophy",
+    });
+  if (streak >= 7)
+    badges.push({
+      name: "Racha de fuego",
+      description: "Mantuviste una racha de 7 dias.",
+      icon: "flame",
+    });
+  if (totalScore >= 1000)
+    badges.push({
+      name: "Puntaje elite",
+      description: "Superaste los 1000 puntos acumulados.",
+      icon: "zap",
+    });
 
   if (!badges.length) {
-    badges.push({ name: "Getting Started", description: "Complete your first submission", icon: "award" });
+    badges.push({
+      name: "Primeros pasos",
+      description: "Completa tu primer envio para desbloquear insignias.",
+      icon: "award",
+    });
   }
 
   return badges;
+}
+
+function isSubmittedSubmission(submission) {
+  const verdict = String(submission?.verdict || "")
+    .trim()
+    .toLowerCase();
+  if (verdict && verdict !== "pending") return true;
+  const submittedAt = new Date(submission?.submitted_at).getTime();
+  return Number.isFinite(submittedAt) && submittedAt > 0;
+}
+
+function getSolveDurationMs(submission) {
+  const createdAt = new Date(submission?.created_at).getTime();
+  const submittedAt = new Date(submission?.submitted_at).getTime();
+  if (!Number.isFinite(createdAt) || !Number.isFinite(submittedAt)) return null;
+  if (submittedAt < createdAt) return null;
+  return submittedAt - createdAt;
+}
+
+function buildUserRanking(users, submissions) {
+  const scoreByUserId = new Map(users.map((user) => [String(user.id || ""), 0]));
+
+  submissions.filter(isSubmittedSubmission).forEach((submission) => {
+    const userId = String(submission.user_id || "");
+    if (!scoreByUserId.has(userId)) return;
+    scoreByUserId.set(userId, scoreByUserId.get(userId) + Number(submission.final_score || 0));
+  });
+
+  const sorted = users
+    .slice()
+    .sort((a, b) => {
+      const scoreA = scoreByUserId.get(String(a.id || "")) || 0;
+      const scoreB = scoreByUserId.get(String(b.id || "")) || 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return String(a.username || "").localeCompare(String(b.username || ""));
+    })
+    .map((user, index) => ({ userId: String(user.id || ""), rank: index + 1 }));
+
+  return new Map(sorted.map((entry) => [entry.userId, entry.rank]));
 }
 
 function formatSubmission(submission) {
@@ -54,6 +121,7 @@ function formatSubmission(submission) {
     final_score: Number(submission.final_score || 0),
     runtime_ms: Number(submission.runtime_ms || 0),
     submitted_at: submission.submitted_at || submission.created_at,
+    solve_duration_ms: getSolveDurationMs(submission),
     stage_results: submission.stage_results,
   };
 }
@@ -64,7 +132,11 @@ export async function getProfile(userId) {
     throw new HttpError(404, "Usuario no encontrado.");
   }
 
-  const submissions = await store.listSubmissionsByUser(userId);
+  const [submissions, allUsers, allSubmissions] = await Promise.all([
+    store.listSubmissionsByUser(userId),
+    store.listUsers(),
+    store.listSubmissions(),
+  ]);
 
   const acceptedProblemIds = new Set(
     submissions
@@ -85,10 +157,8 @@ export async function getProfile(userId) {
     (submission) => submission.submitted_at || submission.created_at,
     { maxLookbackDays: 60 },
   );
-  const leaderboard = await buildLeaderboard("all");
-  const rank =
-    leaderboard.find((entry) => entry.username.toLowerCase() === user.username.toLowerCase())?.rank ||
-    leaderboard.length + 1;
+  const rankByUserId = buildUserRanking(allUsers, allSubmissions);
+  const rank = rankByUserId.get(String(user.id || "")) || allUsers.length;
 
   const badges = buildBadges({
     solved,
@@ -102,10 +172,12 @@ export async function getProfile(userId) {
     stats: {
       total_score: totalScore,
       solved,
+      total_problems: problems.length,
       by_difficulty: difficultyStats,
     },
     streak,
     rank,
+    total_users: allUsers.length,
     badges,
   };
 }
