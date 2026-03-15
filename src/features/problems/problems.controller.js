@@ -6,6 +6,7 @@ export async function listProblemsController(req, res) {
     difficulty: req.query?.difficulty,
     search: req.query?.search,
     tag: req.query?.tag,
+    status: req.query?.status,
   });
   const pagination = parsePaginationQuery(req.query);
   const payload = paginateItems(allItems, pagination);

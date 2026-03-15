@@ -27,6 +27,62 @@ const TEMPLATE_MARKERS = [
   "write your solution here",
 ];
 
+function normalizeStatus(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function canonicalStatus(value) {
+  const status = normalizeStatus(value);
+  if (status === "publicado") return "published";
+  if (status === "borrador") return "draft";
+  if (status === "archivado") return "archived";
+  if (status === "pendiente") return "pending";
+  return status;
+}
+
+function isPublishedStatus(value) {
+  return canonicalStatus(value) === "published";
+}
+
+function isSubmittedSubmission(submission) {
+  const verdict = normalizeStatus(submission?.verdict);
+  if (verdict && verdict !== "pending") return true;
+  const submittedAt = new Date(submission?.submitted_at).getTime();
+  return Number.isFinite(submittedAt) && submittedAt > 0;
+}
+
+function getSolveDurationMs(submission) {
+  const createdAt = new Date(submission?.created_at).getTime();
+  const submittedAt = new Date(submission?.submitted_at).getTime();
+  if (!Number.isFinite(createdAt) || !Number.isFinite(submittedAt)) return null;
+  if (submittedAt < createdAt) return null;
+  return submittedAt - createdAt;
+}
+
+function average(values) {
+  if (!Array.isArray(values) || values.length === 0) return 0;
+  const total = values.reduce((acc, value) => acc + Number(value || 0), 0);
+  return total / values.length;
+}
+
+function formatDurationShort(durationMs) {
+  const ms = Number(durationMs);
+  if (!Number.isFinite(ms) || ms <= 0) return null;
+
+  const totalSeconds = Math.round(ms / 1000);
+  if (totalSeconds < 60) return `${totalSeconds}s`;
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes < 60) return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+}
+
 function normalizeComparableText(value) {
   return String(value || "")
     .normalize("NFD")
@@ -186,9 +242,21 @@ export async function getAdminOverview() {
     getAllProblems(),
   ]);
 
+  const submittedSubmissions = submissions.filter(isSubmittedSubmission);
+  const acceptedSubmissions = submittedSubmissions.filter(
+    (submission) => normalizeStatus(submission.verdict) === "accepted",
+  );
+
+  const userNameById = new Map(
+    users.map((user) => [
+      String(user.id || ""),
+      String(user.display_name || user.username || user.id || "Usuario").trim() || "Usuario",
+    ]),
+  );
+
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const activeUsers = new Set(
-    submissions
+    submittedSubmissions
       .filter((submission) => {
         const timestamp = new Date(submission.submitted_at || submission.created_at).getTime();
         return Number.isFinite(timestamp) && timestamp > sevenDaysAgo;
@@ -196,8 +264,13 @@ export async function getAdminOverview() {
       .map((submission) => submission.user_id),
   );
 
-  const acceptedCount = submissions.filter((submission) => submission.verdict === "accepted").length;
-  const acceptanceRate = submissions.length > 0 ? (acceptedCount / submissions.length) * 100 : 0;
+  const acceptedCount = acceptedSubmissions.length;
+  const acceptanceRate =
+    submittedSubmissions.length > 0 ? (acceptedCount / submittedSubmissions.length) * 100 : 0;
+  const acceptedSolveDurations = acceptedSubmissions
+    .map(getSolveDurationMs)
+    .filter((value) => Number.isFinite(value) && value >= 0);
+  const averageResolutionTimeMs = Math.round(average(acceptedSolveDurations));
 
   const tagCounts = new Map();
   problems.forEach((problem) => {
@@ -213,7 +286,7 @@ export async function getAdminOverview() {
     .slice(0, 10)
     .map(([tag, count]) => ({ tag, count }));
 
-  const recentActivity = submissions
+  const recentActivity = submittedSubmissions
     .slice()
     .sort(
       (a, b) =>
@@ -221,27 +294,34 @@ export async function getAdminOverview() {
         new Date(a.submitted_at || a.created_at).getTime(),
     )
     .slice(0, 20)
-    .map((submission, index) => ({
-      id: submission.id || `activity_${index}`,
-      type: submission.verdict === "accepted" ? "submission_accepted" : "submission",
-      label: `${submission.problem_title} by user ${submission.user_id}`,
-      created_at: submission.submitted_at || submission.created_at,
-    }));
+    .map((submission, index) => {
+      const actorName =
+        userNameById.get(String(submission.user_id || "")) || String(submission.user_id || "Usuario");
+      const durationText = formatDurationShort(getSolveDurationMs(submission));
+      const baseLabel = `${submission.problem_title} - ${actorName}`;
+      return {
+        id: submission.id || `activity_${index}`,
+        type: submission.verdict === "accepted" ? "submission_accepted" : "submission",
+        label: durationText ? `${baseLabel} (${durationText})` : baseLabel,
+        created_at: submission.submitted_at || submission.created_at,
+      };
+    });
 
   const aiGeneratedProblems = problems.filter((problem) => problem.source === "ai").length;
-  const draftProblems = problems.filter((problem) => problem.status === "draft").length;
+  const publishedProblems = problems.filter((problem) => isPublishedStatus(problem.status)).length;
 
   return {
     kpis: {
       total_users: users.length,
       active_users_7d: activeUsers.size,
       total_problems: problems.length,
-      published_problems: problems.length - draftProblems,
-      draft_problems: draftProblems,
-      total_submissions: submissions.length,
+      published_problems: publishedProblems,
+      draft_problems: problems.filter((problem) => canonicalStatus(problem.status) === "draft").length,
+      total_submissions: submittedSubmissions.length,
       accepted_submissions: acceptedCount,
       acceptance_rate: Number(acceptanceRate.toFixed(1)),
       ai_generated_problems: aiGeneratedProblems,
+      avg_resolution_time_ms: averageResolutionTimeMs,
     },
     top_tags: topTags,
     recent_activity: recentActivity,
@@ -251,9 +331,10 @@ export async function getAdminOverview() {
 
 export async function listAdminUsers() {
   const [users, submissions] = await Promise.all([store.listUsers(), store.listSubmissions()]);
+  const submittedSubmissions = submissions.filter(isSubmittedSubmission);
 
   const submissionsByUser = new Map();
-  submissions.forEach((submission) => {
+  submittedSubmissions.forEach((submission) => {
     if (!submissionsByUser.has(submission.user_id)) {
       submissionsByUser.set(submission.user_id, []);
     }
@@ -289,8 +370,56 @@ export async function deleteAdminUser({ userId, requestedByUserId }) {
 }
 
 export async function listAdminProblems() {
-  const problems = await getAllProblems();
-  return problems.map(toAdminProblem);
+  const [problems, submissions] = await Promise.all([getAllProblems(), store.listSubmissions()]);
+  const submittedSubmissions = submissions.filter(isSubmittedSubmission);
+
+  const perProblem = new Map();
+
+  for (const submission of submittedSubmissions) {
+    const problemId = String(submission.problem_id || "").trim();
+    if (!problemId) continue;
+
+    if (!perProblem.has(problemId)) {
+      perProblem.set(problemId, {
+        total: 0,
+        accepted: 0,
+        durations: [],
+      });
+    }
+
+    const stats = perProblem.get(problemId);
+    stats.total += 1;
+
+    if (normalizeStatus(submission.verdict) === "accepted") {
+      stats.accepted += 1;
+      const solveDuration = getSolveDurationMs(submission);
+      if (Number.isFinite(solveDuration) && solveDuration >= 0) {
+        stats.durations.push(solveDuration);
+      }
+    }
+  }
+
+  return problems.map((problem) => {
+    const stats = perProblem.get(String(problem.id || "")) || {
+      total: 0,
+      accepted: 0,
+      durations: [],
+    };
+    const acceptance = stats.total > 0 ? (stats.accepted / stats.total) * 100 : 0;
+    const avgSolveTimeMs = stats.durations.length
+      ? Math.round(average(stats.durations))
+      : 0;
+    const fastestSolveTimeMs = stats.durations.length ? Math.min(...stats.durations) : 0;
+
+    return toAdminProblem({
+      ...problem,
+      submissions: stats.total,
+      acceptance,
+      accepted_submissions: stats.accepted,
+      avg_solve_time_ms: avgSolveTimeMs,
+      fastest_solve_time_ms: fastestSolveTimeMs,
+    });
+  });
 }
 
 export async function generateAdminProblem({ prompt }) {
