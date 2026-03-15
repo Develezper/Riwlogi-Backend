@@ -44,9 +44,10 @@ export function eventSummary(events = []) {
       if (event.type === "paste") acc.paste += Number(event.char_count || 0);
       if (event.type === "delete") acc.delete += Number(event.char_count || 0);
       if (event.type === "run") acc.run += 1;
+      if (event.type === "focus") acc.focus += 1;
       return acc;
     },
-    { key: 0, paste: 0, delete: 0, run: 0 },
+    { key: 0, paste: 0, delete: 0, run: 0, focus: 0 },
   );
 }
 
@@ -68,7 +69,7 @@ function classifyWithHeuristic(events = []) {
   };
 }
 
-export async function classifyFromEvents(events = []) {
+export async function classifyFromEvents(events = [], code = "") {
   const fallback = classifyWithHeuristic(events);
 
   if (!env.CLASSIFIER_API_BASE) return fallback;
@@ -77,6 +78,7 @@ export async function classifyFromEvents(events = []) {
     const payload = {
       events,
       summary: eventSummary(events),
+      code: String(code || ""),
     };
     const baseUrl = trimTrailingSlash(env.CLASSIFIER_API_BASE);
 
