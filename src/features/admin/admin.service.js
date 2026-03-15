@@ -186,6 +186,13 @@ export async function getAdminOverview() {
     getAllProblems(),
   ]);
 
+  const userNameById = new Map(
+    users.map((user) => [
+      String(user.id || ""),
+      String(user.display_name || user.username || user.id || "Usuario").trim() || "Usuario",
+    ]),
+  );
+
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const activeUsers = new Set(
     submissions
@@ -224,7 +231,9 @@ export async function getAdminOverview() {
     .map((submission, index) => ({
       id: submission.id || `activity_${index}`,
       type: submission.verdict === "accepted" ? "submission_accepted" : "submission",
-      label: `${submission.problem_title} by user ${submission.user_id}`,
+      label: `${submission.problem_title} por ${
+        userNameById.get(String(submission.user_id || "")) || String(submission.user_id || "Usuario")
+      }`,
       created_at: submission.submitted_at || submission.created_at,
     }));
 
