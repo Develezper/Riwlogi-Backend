@@ -19,13 +19,14 @@ import {
 	normalizeSubmissionId,
 } from "./submissions.validation.js";
 
-function extractResult(stdout) {
+function extractResult(stdout, stderr) {
 	const lines = String(stdout || "")
 		.trim()
 		.split("\n");
 	const output = lines.pop().trim();
 	const userLogs = lines.join("\n");
-	return { output, userLogs };
+	const errorLogs = String(stderr || "").trim();
+	return { output, userLogs, errorLogs };
 }
 
 function buildTestCode(userCode, inputText, language) {
@@ -51,12 +52,13 @@ async function runStageTests(tests, { submissionId, language, code }) {
 			const testCode = buildTestCode(code, test.input_text, language);
 			const execution = await runUserCode({ submissionId, language, code: testCode });
 			const runtimeMs = Number(execution.runtime_ms ?? 0);
-			const { output, userLogs } = extractResult(execution.stdout);
+			const { output, userLogs, errorLogs } = extractResult(execution.stdout, execution.stderr);
 			return {
 				output,
 				expected: String(test.expected_text || "").trim(),
 				runtime_ms: runtimeMs,
 				userLogs,
+				errorLogs,
 			};
 		}),
 	);
@@ -128,7 +130,7 @@ export async function runSubmission({
 		const { tests = [] } = stage;
 
 		const [classification, testOutputs] = await Promise.all([
-			shouldClassify ? classifyFromEvents(cleanEvents) : null,
+			shouldClassify ? classifyFromEvents(cleanEvents, code) : null,
 			runStageTests(tests, {
 				submissionId: submission.id,
 				language: submission.language,
@@ -167,7 +169,7 @@ export async function runSubmission({
 		});
 
 		const stdout = testOutputs
-			.map((t) => t.userLogs)
+			.map((t) => [t.userLogs, t.errorLogs].filter(Boolean).join("\n"))
 			.filter(Boolean)
 			.join("\n");
 
@@ -217,7 +219,7 @@ export async function submitSubmission({ userId, submissionId }) {
 			stageResults.length / Math.max(1, problem.stages.length);
 		const rawScore = Math.round(averageScore * completionFactor);
 
-		const classification = await classifyFromEvents(submission.events || []);
+		const classification = await classifyFromEvents(submission.events || [], submission.code || "");
 		const penaltyMultiplier = calculateAiPenalty(classification);
 		const finalScore = Math.round(rawScore * penaltyMultiplier);
 
