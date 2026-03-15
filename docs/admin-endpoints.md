@@ -50,7 +50,7 @@ curl http://localhost:8000/api/admin/overview \
       {
         "id": "sub_123",
         "type": "submission_accepted",
-        "label": "Two Sum by user user_demo",
+        "label": "Two Sum por demo",
         "created_at": "2026-02-18T10:00:00.000Z"
       }
     ],
