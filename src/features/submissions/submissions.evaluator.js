@@ -3,7 +3,11 @@ function normalize(value) {
 	// Replace single quotes with double quotes so Python-style output parses as JSON
 	const withDoubleQuotes = trimmed.replace(/'/g, '"');
 	try {
-		return JSON.stringify(JSON.parse(withDoubleQuotes));
+		const parsed = JSON.parse(withDoubleQuotes);
+		if (typeof parsed === "string") {
+			return parsed.trim().replace(/\s+/g, " ");
+		}
+		return JSON.stringify(parsed);
 	} catch {
 		return trimmed.replace(/\s+/g, "");
 	}

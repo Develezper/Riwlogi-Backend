@@ -31,10 +31,11 @@ function extractResult(stdout, stderr) {
 
 function buildTestCode(userCode, inputText, language) {
 	const lang = String(language || "").toLowerCase();
+	const serializedInput = JSON.stringify(String(inputText ?? ""));
 	if (lang === "python") {
-		return `${userCode}\nimport json as __json\nprint(__json.dumps(solve(${inputText})))`;
+		return `${userCode}\nimport json as __json\nprint(__json.dumps(solve(${serializedInput})))`;
 	}
-	return `${userCode}\nconsole.log(JSON.stringify(solve(${inputText})))`;
+	return `${userCode}\nconsole.log(JSON.stringify(solve(${serializedInput})))`;
 }
 
 function calculateAiPenalty(classification) {
@@ -169,7 +170,12 @@ export async function runSubmission({
 		});
 
 		const stdout = testOutputs
-			.map((t) => [t.userLogs, t.errorLogs].filter(Boolean).join("\n"))
+			.map((t, index) => {
+				const logs = [t.userLogs, t.errorLogs].filter(Boolean).join("\n");
+				if (logs) return logs;
+				if (t.output) return `Test ${index + 1} output: ${t.output}`;
+				return "";
+			})
 			.filter(Boolean)
 			.join("\n");
 
