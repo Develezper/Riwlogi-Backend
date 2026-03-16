@@ -57,14 +57,28 @@ function normalizeVisibleTests(rawVisibleTests) {
   ];
 }
 
+function normalizeHiddenTests(rawHiddenTests) {
+  const source = Array.isArray(rawHiddenTests) ? rawHiddenTests : [];
+  return source
+    .map((test) => {
+      const inputText = String(test?.input_text || "").trim();
+      const expectedText = String(test?.expected_text || "").trim();
+      if (!inputText || !expectedText) return null;
+      return { input_text: inputText, expected_text: expectedText };
+    })
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
 function normalizeSingleStage(problemId, rawStages) {
   const source = Array.isArray(rawStages) ? rawStages : [];
   const stage = source[0] && typeof source[0] === "object" ? source[0] : {};
 
   const promptMd = String(stage?.prompt_md || "").trim();
+  const hiddenTests = normalizeHiddenTests(stage?.hidden_tests);
   const hiddenCount = Number.isFinite(Number(stage?.hidden_count))
     ? Math.max(0, Math.min(2000, Number(stage.hidden_count)))
-    : 2;
+    : hiddenTests.length || 2;
 
   return [
     {
@@ -73,6 +87,7 @@ function normalizeSingleStage(problemId, rawStages) {
       prompt_md: promptMd || "Solve the full problem in a single stage.",
       hidden_count: hiddenCount,
       visible_tests: normalizeVisibleTests(stage?.visible_tests),
+      hidden_tests: hiddenTests,
     },
   ];
 }

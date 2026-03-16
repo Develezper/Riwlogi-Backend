@@ -47,15 +47,27 @@ function normalizeSingleStage(rawStages) {
           input_text: String(test?.input_text || "").trim(),
           expected_text: String(test?.expected_text || "").trim(),
         }))
-        .filter((test) => test.input_text || test.expected_text)
+        .filter((test) => test.input_text && test.expected_text)
     : [];
+
+  const hiddenTests = Array.isArray(stage.hidden_tests)
+    ? stage.hidden_tests
+        .map((test) => ({
+          input_text: String(test?.input_text || "").trim(),
+          expected_text: String(test?.expected_text || "").trim(),
+        }))
+        .filter((test) => test.input_text && test.expected_text)
+    : [];
+
+  const normalizedHiddenCount = hiddenTests.length > 0 ? hiddenTests.length : hiddenCount;
 
   return [
     {
       stage_index: 1,
       prompt_md: String(stage.prompt_md || "").trim(),
-      hidden_count: hiddenCount,
+      hidden_count: normalizedHiddenCount,
       visible_tests: visibleTests,
+      hidden_tests: hiddenTests,
     },
   ];
 }
