@@ -15,6 +15,41 @@ beforeEach(() => {
 });
 
 describe("admin services", () => {
+  it("lists admin problems ordered by most recent update", async () => {
+    const first = await generateAdminProblem({
+      prompt: "Create a queue challenge for beginners.",
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const second = await generateAdminProblem({
+      prompt: "Create a stack challenge for beginners.",
+    });
+
+    const initialList = await listAdminProblems();
+    const firstInitialIndex = initialList.findIndex((problem) => problem.id === first.id);
+    const secondInitialIndex = initialList.findIndex((problem) => problem.id === second.id);
+
+    expect(firstInitialIndex).toBeGreaterThanOrEqual(0);
+    expect(secondInitialIndex).toBeGreaterThanOrEqual(0);
+    expect(secondInitialIndex).toBeLessThan(firstInitialIndex);
+
+    await updateAdminProblem({
+      problemId: first.id,
+      updates: {
+        difficulty: 3,
+      },
+    });
+
+    const updatedList = await listAdminProblems();
+    const firstUpdatedIndex = updatedList.findIndex((problem) => problem.id === first.id);
+    const secondUpdatedIndex = updatedList.findIndex((problem) => problem.id === second.id);
+
+    expect(firstUpdatedIndex).toBeGreaterThanOrEqual(0);
+    expect(secondUpdatedIndex).toBeGreaterThanOrEqual(0);
+    expect(firstUpdatedIndex).toBeLessThan(secondUpdatedIndex);
+  });
+
   it("persists generated problems and supports update/delete", async () => {
     const generated = await generateAdminProblem({
       prompt: "Create a graph traversal challenge for intermediate developers.",

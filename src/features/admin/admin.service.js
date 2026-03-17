@@ -67,6 +67,25 @@ function average(values) {
   return total / values.length;
 }
 
+function toProblemSortTimestamp(problem) {
+  const updatedAt = new Date(problem?.updated_at).getTime();
+  if (Number.isFinite(updatedAt)) return updatedAt;
+
+  const createdAt = new Date(problem?.created_at).getTime();
+  return Number.isFinite(createdAt) ? createdAt : 0;
+}
+
+function compareProblemsByMostRecent(left, right) {
+  const byRecentTimestamp = toProblemSortTimestamp(right) - toProblemSortTimestamp(left);
+  if (byRecentTimestamp !== 0) return byRecentTimestamp;
+
+  const byCreatedAt =
+    (new Date(right?.created_at).getTime() || 0) - (new Date(left?.created_at).getTime() || 0);
+  if (byCreatedAt !== 0) return byCreatedAt;
+
+  return String(left?.id || "").localeCompare(String(right?.id || ""));
+}
+
 function formatDurationShort(durationMs) {
   const ms = Number(durationMs);
   if (!Number.isFinite(ms) || ms <= 0) return null;
@@ -399,7 +418,9 @@ export async function listAdminProblems() {
     }
   }
 
-  return problems.map((problem) => {
+  const sortedProblems = problems.slice().sort(compareProblemsByMostRecent);
+
+  return sortedProblems.map((problem) => {
     const stats = perProblem.get(String(problem.id || "")) || {
       total: 0,
       accepted: 0,
