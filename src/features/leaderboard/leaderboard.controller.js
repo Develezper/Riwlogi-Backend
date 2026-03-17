@@ -1,9 +1,12 @@
-import { listLeaderboard } from "./leaderboard.service.js";
-import { paginateItems, parsePaginationQuery } from "../../utils/pagination.js";
+import { listLeaderboardPage } from "./leaderboard.service.js";
+import { parsePaginationQuery } from "../../utils/pagination.js";
 
 export async function leaderboardController(req, res) {
-  const allItems = await listLeaderboard({ timeframe: req.query?.timeframe });
   const pagination = parsePaginationQuery(req.query);
-  const payload = paginateItems(allItems, pagination);
+  const payload = await listLeaderboardPage({
+    timeframe: req.query?.timeframe,
+    page: pagination.page,
+    limit: pagination.limit,
+  });
   res.json(payload);
 }

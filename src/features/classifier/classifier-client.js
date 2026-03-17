@@ -100,6 +100,8 @@ export async function requestClassifierApi({
   headers,
   timeout,
   validateStatus,
+  maxRetries,
+  retryMaxElapsedMs,
 }) {
   const requestUrl = url || buildClassifierUrl(path);
   if (!requestUrl) {
@@ -108,11 +110,16 @@ export async function requestClassifierApi({
     throw error;
   }
 
-  const maxRetries = env.CLASSIFIER_API_MAX_RETRIES;
+  const resolvedMaxRetries = Number.isInteger(maxRetries)
+    ? Math.max(0, maxRetries)
+    : env.CLASSIFIER_API_MAX_RETRIES;
+  const resolvedRetryMaxElapsedMs = Number.isFinite(retryMaxElapsedMs)
+    ? Math.max(500, Number(retryMaxElapsedMs))
+    : env.CLASSIFIER_API_RETRY_MAX_ELAPSED_MS;
   const startedAt = Date.now();
   let attempt = 0;
 
-  while (attempt <= maxRetries) {
+  while (attempt <= resolvedMaxRetries) {
     attempt += 1;
 
     try {
@@ -126,13 +133,13 @@ export async function requestClassifierApi({
       });
 
       const retryableResponse = shouldRetryResponse(response);
-      const hasRetryBudget = attempt <= maxRetries;
+      const hasRetryBudget = attempt <= resolvedMaxRetries;
       const elapsedMs = Date.now() - startedAt;
 
       if (
         retryableResponse &&
         hasRetryBudget &&
-        elapsedMs < env.CLASSIFIER_API_RETRY_MAX_ELAPSED_MS
+        elapsedMs < resolvedRetryMaxElapsedMs
       ) {
         const delayMs = calculateRetryDelay(attempt);
 
@@ -140,7 +147,7 @@ export async function requestClassifierApi({
           buildRetryContext({
             operationName,
             attempt,
-            maxRetries,
+            maxRetries: resolvedMaxRetries,
             elapsedMs,
             delayMs,
             status: parseStatus(response),
@@ -156,12 +163,12 @@ export async function requestClassifierApi({
     } catch (error) {
       const elapsedMs = Date.now() - startedAt;
       const isRetryable = shouldRetryError(error);
-      const hasRetryBudget = attempt <= maxRetries;
+      const hasRetryBudget = attempt <= resolvedMaxRetries;
 
       if (
         !isRetryable ||
         !hasRetryBudget ||
-        elapsedMs >= env.CLASSIFIER_API_RETRY_MAX_ELAPSED_MS
+        elapsedMs >= resolvedRetryMaxElapsedMs
       ) {
         throw error;
       }
@@ -171,7 +178,7 @@ export async function requestClassifierApi({
         buildRetryContext({
           operationName,
           attempt,
-          maxRetries,
+          maxRetries: resolvedMaxRetries,
           elapsedMs,
           delayMs,
           error,

@@ -1,5 +1,5 @@
-import { getProfile, getProfileSubmissions } from "./profile.service.js";
-import { paginateItems, parsePaginationQuery } from "../../utils/pagination.js";
+import { getProfile, getProfileSubmissionsPage } from "./profile.service.js";
+import { parsePaginationQuery } from "../../utils/pagination.js";
 
 export async function profileController(req, res) {
   const payload = await getProfile(req.auth.userId);
@@ -7,8 +7,7 @@ export async function profileController(req, res) {
 }
 
 export async function profileSubmissionsController(req, res) {
-  const allItems = await getProfileSubmissions(req.auth.userId);
   const pagination = parsePaginationQuery(req.query);
-  const payload = paginateItems(allItems, pagination);
+  const payload = await getProfileSubmissionsPage(req.auth.userId, pagination);
   res.json(payload);
 }

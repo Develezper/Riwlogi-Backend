@@ -6,6 +6,10 @@ import {
 import { nowIso } from "../../utils/time.js";
 import { z } from "zod";
 
+const SUBMISSION_CLASSIFIER_TIMEOUT_MS = 1800;
+const SUBMISSION_CLASSIFIER_MAX_RETRIES = 1;
+const SUBMISSION_CLASSIFIER_MAX_ELAPSED_MS = 2500;
+
 const rawSubmissionEventSchema = z.preprocess(
   (value) => (value && typeof value === "object" ? value : {}),
   z
@@ -87,7 +91,9 @@ export async function classifyFromEvents(events = [], code = "") {
       method: "POST",
       url: `${baseUrl}/classify`,
       data: payload,
-      timeout: env.CLASSIFIER_API_TIMEOUT_MS,
+      timeout: Math.min(env.CLASSIFIER_API_TIMEOUT_MS, SUBMISSION_CLASSIFIER_TIMEOUT_MS),
+      maxRetries: SUBMISSION_CLASSIFIER_MAX_RETRIES,
+      retryMaxElapsedMs: SUBMISSION_CLASSIFIER_MAX_ELAPSED_MS,
       validateStatus: () => true,
     });
 
